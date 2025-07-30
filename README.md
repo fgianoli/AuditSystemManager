@@ -359,13 +359,13 @@ This project is licensed under the GNU General Public License v2.0 - see the [LI
 
 - **Federico Gianoli** - *Initial work* - [gianoli.federico@gmail.com](mailto:gianoli.federico@gmail.com)
 
-See also the list of [contributors](../../contributors) who participated in this project.
 
 ## 🙏 Acknowledgments
 
 - QGIS Development Team for the excellent framework
 - PostgreSQL Community for robust database features
-- Italian GIS Community for testing and feedback
+- Rocco Pispico, for inspiring me
+- Ulderico Sicilia, for the idea
 - Open Source contributors who made this possible
 
 ## 📞 Support
