@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
+        h1 { color: #2c3e50; border-bottom: 2px solid #3498db; }
+        h2 { color: #34495e; margin-top: 30px; }
+        h3 { color: #7f8c8d; }
+        ul, ol { margin-left: 20px; }
+        li { margin-bottom: 8px; }
+        .feature { background: #ecf0f1; padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .highlight { background: #fff3cd; padding: 8px; border-radius: 4px; }
+        code { background: #f8f9fa; padding: 2px 6px; border-radius: 3px; font-family: Consolas, monospace; }
+    </style>
+</head>
+<body>
+    <h1>Audit System Manager - Panoramica</h1>
+    
+    <h2>Che cos'è l'Audit System Manager?</h2>
+    <p>L'Audit System Manager è uno strumento completo per il monitoraggio e la gestione di database PostgreSQL integrato in QGIS. Fornisce:</p>
+    
+    <div class="feature">
+        <ul>
+            <li><strong>Monitoraggio in tempo reale</strong> di tutte le modifiche al database (INSERT, UPDATE, DELETE)</li>
+            <li><strong>Gestione delle versioni</strong> con cronologia completa delle modifiche</li>
+            <li><strong>Capacità di rollback</strong> per annullare le modifiche in sicurezza</li>
+            <li><strong>Tracciamento dell'attività utente</strong> e report di conformità</li>
+            <li><strong>Supporto per metadati</strong> per motivi di modifica e contesto</li>
+            <li><strong>Rilevamento intelligente degli ID</strong> con scoperta automatica delle chiavi primarie</li>
+            <li><strong>Integrazione del menu contestuale</strong> per un flusso di lavoro fluido</li>
+        </ul>
+    </div>
+    
+    <h2>Caratteristiche Principali</h2>
+    
+    <h3>Tab Monitoraggio</h3>
+    <p>Traccia tutte le modifiche al database in tempo reale con opzioni di filtro avanzate:</p>
+    <ul>
+        <li>Filtra per utente, schema, periodo di tempo</li>
+        <li>Operazioni codificate a colori (verde=INSERT, arancione=UPDATE, rosso=DELETE)</li>
+        <li>Capacità di auto-aggiornamento con intervalli configurabili</li>
+        <li>Rilevamento ID migliorato (id, gid, fid, objectid, ecc.)</li>
+        <li>Colonna debug per la risoluzione dei problemi di estrazione ID</li>
+        <li>Menu contestuale con copia negli appunti e auto-compilazione</li>
+    </ul>
+    
+    <h3>Tab Versioning</h3>
+    <p>Gestisce le versioni dei record con confronto dettagliato:</p>
+    <ul>
+        <li>Ricerca versioni per schema, tabella e ID record</li>
+        <li>Confronto fianco a fianco tra versioni</li>
+        <li>Analisi delle differenze campo per campo</li>
+        <li>Visualizzazione della cronologia completa delle modifiche</li>
+        <li>Auto-compilazione da righe del monitoraggio</li>
+    </ul>
+    
+    <h3>Tab Rollback</h3>
+    <p>Operazioni di rollback sicure e controllate:</p>
+    <ul>
+        <li><strong>Rollback singolo record:</strong> Ripristina un record specifico a una versione precedente</li>
+        <li><strong>Annullamento modifiche utente:</strong> Annulla tutte le modifiche di un utente in una finestra temporale</li>
+        <li><strong>Modalità test (Dry Run):</strong> Anteprima delle modifiche prima dell'esecuzione</li>
+        <li><strong>Cronologia rollback:</strong> Traccia tutti i rollback eseguiti</li>
+        <li><strong>Motivi obbligatori:</strong> Documenta il motivo di ogni rollback</li>
+    </ul>
+    
+    <h3>Tab Statistiche</h3>
+    <p>Analisi e report completi:</p>
+    <ul>
+        <li><strong>Metriche rapide:</strong> Modifiche di oggi, utenti attivi, tabelle modificate</li>
+        <li><strong>Top utenti:</strong> Classifica per attività (inserimenti, aggiornamenti, eliminazioni)</li>
+        <li><strong>Top tabelle:</strong> Tabelle più modificate con coinvolgimento utenti</li>
+        <li><strong>Attività oraria:</strong> Distribuzione delle modifiche per ora del giorno</li>
+    </ul>
+    
+    <h3>Tab Configurazione</h3>
+    <p>Gestione completa del sistema e delle connessioni:</p>
+    <ul>
+        <li><strong>Configurazione database:</strong> Gestione sicura delle credenziali</li>
+        <li><strong>Setup sistema audit:</strong> Installazione e configurazione guidata</li>
+        <li><strong>Monitoraggio schemi:</strong> Seleziona quali schemi/tabelle monitorare</li>
+        <li><strong>Opzioni di aggiornamento:</strong> Intervalli personalizzabili</li>
+        <li><strong>Informazioni sistema:</strong> Stato e diagnostica</li>
+    </ul>
+    
+    <h2>Architettura del Sistema</h2>
+    
+    <div class="highlight">
+        <h3>Funzioni SECURITY DEFINER</h3>
+        <p>Il sistema utilizza funzioni PostgreSQL <code>SECURITY DEFINER</code> per garantire:</p>
+        <ul>
+            <li><strong>Isolamento dei privilegi:</strong> Gli utenti possono fare audit senza privilegi diretti sulle tabelle</li>
+            <li><strong>Sicurezza centralizzata:</strong> Tutti i permessi gestiti tramite ownership delle funzioni</li>
+            <li><strong>Protezione da SQL injection:</strong> Validazione e sanitizzazione input integrate</li>
+            <li><strong>Accesso basato su ruoli:</strong> Funzioni di rollback limitate ai ruoli admin</li>
+        </ul>
+    </div>
+    
+    <h3>Rilevamento ID Intelligente</h3>
+    <p>Il sistema supporta automaticamente questi tipi di campo ID:</p>
+    <ul>
+        <li><code>id</code> - Standard ID principale</li>
+        <li><code>gid</code> - ID geometrico (PostGIS)</li>
+        <li><code>fid</code> - Feature ID</li>
+        <li><code>objectid</code> - Object ID (ArcGIS compatibility)</li>
+        <li><code>oid</code> - Object identifier</li>
+        <li><code>pk</code> - Primary key</li>
+        <li><code>_id</code> - Underscore ID</li>
+        <li>Qualsiasi campo che termina con 'id'</li>
+        <li>Chiavi primarie rilevate automaticamente</li>
+    </ul>
+    
+    <h2>Flusso di Lavoro Tipico</h2>
+    
+    <h3>Monitoraggio Quotidiano</h3>
+    <ol>
+        <li>Apri il plugin e verifica lo stato della connessione</li>
+        <li>Configura i filtri nel tab <strong>Monitoraggio</strong> (utente, schema, periodo)</li>
+        <li>Attiva l'auto-aggiornamento per il monitoraggio continuo</li>
+        <li>Usa il menu contestuale per azioni rapide su record specifici</li>
+        <li>Esamina i dettagli dei record per modifiche sospette</li>
+    </ol>
+    
+    <h3>Analisi Versioni</h3>
+    <ol>
+        <li>Dal monitoraggio, usa "Auto-fill Versioning Search" su un record interessante</li>
+        <li>Nel tab <strong>Versioning</strong>, esamina la cronologia completa del record</li>
+        <li>Confronta versioni diverse per capire l'evoluzione dei dati</li>
+        <li>Analizza le differenze campo per campo</li>
+    </ol>
+    
+    <h3>Operazioni di Rollback</h3>
+    <ol>
+        <li>Identifica la modifica da annullare</li>
+        <li>Nel tab <strong>Rollback</strong>, scegli il tipo di operazione:</li>
+        <ul>
+            <li><strong>Singolo record:</strong> Per modifiche specifiche</li>
+            <li><strong>Modifiche utente:</strong> Per annullare l'attività di un utente</li>
+        </ul>
+        <li>Usa sempre la modalità "Test (Dry Run)" prima dell'esecuzione</li>
+        <li>Fornisci un motivo dettagliato per il rollback</li>
+        <li>Monitora i risultati nella cronologia rollback</li>
+    </ol>
+    
+    <h2>Vantaggi per l'Organizzazione</h2>
+    
+    <h3>Conformità e Audit</h3>
+    <ul>
+        <li>Tracciabilità completa di tutte le modifiche ai dati</li>
+        <li>Report dettagliati per audit esterni</li>
+        <li>Identificazione degli utenti responsabili delle modifiche</li>
+        <li>Cronologia immutabile delle operazioni</li>
+    </ul>
+    
+    <h3>Sicurezza dei Dati</h3>
+    <ul>
+        <li>Capacità di recupero rapido da errori</li>
+        <li>Controllo delle modifiche non autorizzate</li>
+        <li>Rollback sicuro senza perdita di dati</li>
+        <li>Isolamento dei privilegi con SECURITY DEFINER</li>
+    </ul>
+    
+    <h3>Efficienza Operativa</h3>
+    <ul>
+        <li>Riduzione del tempo per identificare problemi</li>
+        <li>Interfaccia integrata in QGIS</li>
+        <li>Monitoraggio automatico senza intervento manuale</li>
+        <li>Export dei dati per analisi esterne</li>
+    </ul>
+    
+    <h2>Requisiti di Sistema</h2>
+    
+    <div class="feature">
+        <h3>Requisiti Software</h3>
+        <ul>
+            <li><strong>QGIS:</strong> Versione 3.0 o superiore</li>
+            <li><strong>PostgreSQL:</strong> Versione 10 o superiore</li>
+            <li><strong>Python:</strong> psycopg2-binary installato</li>
+            <li><strong>Privilegi database:</strong> CREATE per l'installazione iniziale</li>
+        </ul>
+        
+        <h3>Compatibilità</h3>
+        <ul>
+            <li>Rilevamento automatico Qt5/Qt6</li>
+            <li>Compatibile con PostGIS</li>
+            <li>Supporto per schemi multipli</li>
+            <li>Integrazione con workflow QGIS esistenti</li>
+        </ul>
+    </div>
+    
+    <p><em>Per informazioni dettagliate su installazione, configurazione e utilizzo, consulta le altre sezioni della documentazione.</em></p>
+</body>
+</html>

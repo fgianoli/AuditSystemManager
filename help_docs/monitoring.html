@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
+        h1 { color: #2c3e50; border-bottom: 2px solid #3498db; }
+        h2 { color: #34495e; margin-top: 30px; }
+        h3 { color: #7f8c8d; }
+        ul, ol { margin-left: 20px; }
+        li { margin-bottom: 8px; }
+        .feature { background: #ecf0f1; padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .highlight { background: #fff3cd; padding: 8px; border-radius: 4px; }
+        .warning { background: #f8d7da; padding: 8px; border-radius: 4px; border-left: 4px solid #dc3545; }
+        .tip { background: #d1ecf1; padding: 8px; border-radius: 4px; border-left: 4px solid #17a2b8; }
+        code { background: #f8f9fa; padding: 2px 6px; border-radius: 3px; font-family: Consolas, monospace; }
+        table { border-collapse: collapse; width: 100%; margin: 15px 0; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <h1>Sistema di Monitoraggio in Tempo Reale</h1>
+    
+    <h2>Panoramica del Monitoraggio</h2>
+    <p>Il tab <strong>Monitoraggio</strong> è il cuore dell'Audit System Manager, fornendo visibilità in tempo reale di tutte le modifiche apportate al database. Ogni operazione INSERT, UPDATE e DELETE viene catturata e visualizzata con dettagli completi.</p>
+    
+    <h2>Interfaccia di Monitoraggio</h2>
+    
+    <h3>Filtri di Ricerca</h3>
+    <div class="feature">
+        <table>
+            <tr>
+                <th>Filtro</th>
+                <th>Opzioni</th>
+                <th>Descrizione</th>
+            </tr>
+            <tr>
+                <td><strong>Utente</strong></td>
+                <td>All users, [lista utenti attivi]</td>
+                <td>Filtra per utente che ha eseguito la modifica</td>
+            </tr>
+            <tr>
+                <td><strong>Schema</strong></td>
+                <td>All schemas, total, office_data, old_city, sectorial</td>
+                <td>Filtra per schema del database</td>
+            </tr>
+            <tr>
+                <td><strong>Periodo</strong></td>
+                <td>Last hour, Last 6 hours, Today, Last 3 days, Last week</td>
+                <td>Filtra per intervallo temporale</td>
+            </tr>
+        </table>
+    </div>
+    
+    <h3>Tabella delle Modifiche</h3>
+    <p>La tabella principale mostra le modifiche con le seguenti colonne:</p>
+    
+    <div class="feature">
+        <ul>
+            <li><strong>Date/Time:</strong> Timestamp preciso della modifica (formato DD/MM/YYYY HH:MM:SS)</li>
+            <li><strong>User:</strong> Nome utente che ha eseguito l'operazione</li>
+            <li><strong>Table:</strong> Schema e nome della tabella (formato schema.tabella)</li>
+            <li><strong>Action:</strong> Tipo di operazione (INSERT/UPDATE/DELETE)</li>
+            <li><strong>Record ID:</strong> Identificativo del record modificato (rilevamento automatico)</li>
+            <li><strong>Reason:</strong> Motivo della modifica (se specificato)</li>
+            <li><strong>Version:</strong> Numero di versione del record</li>
+            <li><strong>Debug Keys:</strong> Chiavi JSON disponibili (colonna nascosta per debug)</li>
+        </ul>
+    </div>
+    
+    <h2>Codifica Colori delle Operazioni</h2>
+    
+    <div class="feature">
+        <h3>Sistema di Colori Intuitivo</h3>
+        <ul>
+            <li><strong style="color: #4CAF50;">Verde chiaro:</strong> Operazioni INSERT (nuovi record)</li>
+            <li><strong style="color: #FF9800;">Arancione chiaro:</strong> Operazioni UPDATE (modifiche record)</li>
+            <li><strong style="color: #f44336;">Rosso chiaro:</strong> Operazioni DELETE (eliminazioni record)</li>
+            <li><strong style="color: #9E9E9E;">Grigio chiaro:</strong> Operazioni non categorizzate</li>
+        </ul>
+    </div>
+    
+    <h2>Rilevamento Intelligente degli ID</h2>
+    
+    <div class="highlight">
+        <h3>Sistema di Rilevamento Automatico</h3>
+        <p>Il sistema utilizza un algoritmo intelligente per identificare l'ID del record:</p>
+        
+        <h4>Priorità di Rilevamento</h4>
+        <ol>
+            <li><code>id</code> - ID standard più comune</li>
+            <li><code>gid</code> - ID geometrico (PostGIS)</li>
+            <li><code>fid</code> - Feature ID</li>
+            <li><code>objectid</code> - Object ID (compatibilità ArcGIS)</li>
+            <li><code>oid</code> - Object identifier</li>
+            <li><code>pk</code> - Primary key</li>
+            <li><code>_id</code> - ID con underscore</li>
+            <li>Qualsiasi campo che termina con 'id'</li>
+            <li>Chiave primaria rilevata dallo schema</li>
+        </ol>
+    </div>
+    
+    <h3>Gestione Campi ID Non Standard</h3>
+    <div class="tip">
+        <p><strong>Suggerimento:</strong> Se l'ID non viene rilevato correttamente:</p>
+        <ul>
+            <li>Usa il menu contestuale "Show/Hide Debug Keys" per vedere i campi disponibili</li>
+            <li>Controlla la colonna "Debug Keys" per identificare il campo ID corretto</li>
+            <li>Usa "Show Record Details" per esaminare la struttura JSON completa</li>
+        </ul>
+    </div>
+    
+    <h2>Funzionalità Auto-Refresh</h2>
+    
+    <h3>Configurazione Auto-Refresh</h3>
+    <div class="feature">
+        <ul>
+            <li><strong>Checkbox Auto-refresh:</strong> Attiva/disattiva l'aggiornamento automatico</li>
+            <li><strong>Intervallo predefinito:</strong> 30 secondi (configurabile nelle impostazioni)</li>
+            <li><strong>Indicatore di stato:</strong> Mostra "Auto-refresh active" nella barra di stato</li>
+            <li><strong>Gestione intelligente:</strong> Si ferma automaticamente in caso di errori</li>
+        </ul>
+    </div>
+    
+    <div class="warning">
+        <p><strong>Attenzione:</strong> L'auto-refresh può impattare le prestazioni con grandi volumi di dati. Usa filtri appropriati per limitare il carico.</p>
+    </div>
+    
+    <h2>Menu Contestuale Avanzato</h2>
+    
+    <h3>Accesso Rapido alle Funzioni</h3>
+    <p>Fai clic destro su qualsiasi riga della tabella per accedere a:</p>
+    
+    <div class="feature">
+        <h4>Azioni di Copia</h4>
+        <ul>
+            <li><strong>Copy ID:</strong> Copia l'ID del record negli appunti</li>
+            <li><strong>Copy Table:</strong> Copia il nome della tabella negli appunti</li>
+        </ul>
+        
+        <h4>Azioni di Visualizzazione</h4>
+        <ul>
+            <li><strong>Show Record Details:</strong> Mostra i dettagli completi del record con JSON formattato</li>
+            <li><strong>Show/Hide Debug Keys:</strong> Attiva/disattiva la colonna di debug</li>
+        </ul>
+        
+        <h4>Azioni di Integrazione</h4>
+        <ul>
+            <li><strong>Auto-fill Versioning Search:</strong> Compila automaticamente il form di ricerca versioni</li>
+        </ul>
+    </div>
+    
+    <h2>Pulsanti di Azione Rapida</h2>
+    
+    <h3>Barra degli Strumenti</h3>
+    <div class="feature">
+        <ul>
+            <li><strong>Details:</strong> Mostra i dettagli del record selezionato</li>
+            <li><strong>Quick Rollback:</strong> Avvia un rollback rapido (in sviluppo)</li>
+            <li><strong>Export CSV:</strong> Esporta i dati filtrati in formato CSV</li>
+        </ul>
+    </div>
+    
+    <h2>Finestra di Dettaglio Record</h2>
+    
+    <h3>Informazioni Dettagliate</h3>
+    <div class="feature">
+        <p>La finestra di dettaglio mostra:</p>
+        <ul>
+            <li><strong>Informazioni di base:</strong> Operazione, utente, timestamp, motivo, tabella</li>
+            <li><strong>Valori precedenti (OLD):</strong> Dati prima della modifica (per UPDATE/DELETE)</li>
+            <li><strong>Valori nuovi (NEW):</strong> Dati dopo la modifica (per INSERT/UPDATE)</li>
+            <li><strong>Formato JSON:</strong> Dati formattati per easy lettura</li>
+        </ul>
+    </div>
+    
+    <h2>Export dei Dati</h2>
+    
+    <h3>Funzionalità di Export CSV</h3>
+    <div class="feature">
+        <h4>Caratteristiche dell'Export</h4>
+        <ul>
+            <li><strong>Separatore:</strong> Punto e virgola (;) per compatibilità Excel italiano</li>
+            <li><strong>Encoding:</strong> UTF-8 per supporto caratteri speciali</li>
+            <li><strong>Metadati:</strong> Include informazioni sui filtri applicati</li>
+            <li><strong>Timestamp:</strong> Nome file con data/ora di generazione</li>
+            <li><strong>Esclusioni:</strong> La colonna debug non viene esportata</li>
+        </ul>
+        
+        <h4>Contenuto del File CSV</h4>
+        <ul>
+            <li>Intestazione con informazioni del report</li>
+            <li>Data di generazione e filtri applicati</li>
+            <li>Numero totale di record esportati</li>
+            <li>Note tecniche sul rilevamento ID</li>
+            <li>Dati delle modifiche in formato tabulare</li>
+        </ul>
+    </div>
+    
+    <h2>Risoluzione Problemi Comuni</h2>
+    
+    <h3>ID Record Non Rilevato</h3>
+    <div class="tip">
+        <p><strong>Soluzione:</strong></p>
+        <ol>
+            <li>Attiva la colonna "Debug Keys" dal menu contestuale</li>
+            <li>Esamina i campi disponibili nella colonna debug</li>
+            <li>Usa "Show Record Details" per vedere la struttura JSON completa</li>
+            <li>Se necessario, contatta l'amministratore per aggiornare la logica di rilevamento</li>
+        </ol>
+    </div>
+    
+    <h3>Performance con Grandi Volumi</h3>
+    <div class="warning">
+        <p><strong>Raccomandazioni:</strong></p>
+        <ul>
+            <li>Usa filtri temporali ristretti (es. "Last hour" invece di "Last week")</li>
+            <li>Filtra per schema specifico quando possibile</li>
+            <li>Disattiva auto-refresh durante analisi lunghe</li>
+            <li>Limita le query a 500 record (limite hardcoded)</li>
+        </ul>
+    </div>
+    
+    <h3>Connessione Database Persa</h3>
+    <div class="tip">
+        <p><strong>Passi di risoluzione:</strong></p>
+        <ol>
+            <li>Verifica lo stato nella barra superiore</li>
+            <li>Usa "Test Connection" nel tab Configurazione</li>
+            <li>Riavvia il plugin se necessario</li>
+            <li>Controlla le credenziali di accesso al database</li>
+        </ol>
+    </div>
+    
+    <h2>Best Practices per il Monitoraggio</h2>
+    
+    <h3>Monitoraggio Quotidiano</h3>
+    <div class="feature">
+        <ul>
+            <li><strong>Controllo mattutino:</strong> Rivedi le modifiche della notte precedente</li>
+            <li><strong>Filtri mirati:</strong> Usa filtri per schema/utente per analisi focalizzate</li>
+            <li><strong>Auto-refresh selettivo:</strong> Attiva solo durante periodi di alta attività</li>
+            <li><strong>Export regolari:</strong> Salva report per analisi offline</li>
+        </ul>
+    </div>
+    
+    <h3>Gestione delle Anomalie</h3>
+    <div class="highlight">
+        <ul>
+            <li><strong>Modifiche fuori orario:</strong> Monitora attività durante ore non lavorative</li>
+            <li><strong>Volume anomalo:</strong> Identifica picchi di attività insoliti</li>
+            <li><strong>Utenti non autorizzati:</strong> Verifica modifiche da utenti inaspettati</li>
+            <li><strong>Operazioni di massa:</strong> Esamina DELETE multiple o UPDATE su larga scala</li>
+        </ul>
+    </div>
+    
+    <h2>Integrazione con Altri Tab</h2>
+    
+    <h3>Flusso di Lavoro Integrato</h3>
+    <div class="feature">
+        <p>Il tab Monitoraggio si integra perfettamente con:</p>
+        <ul>
+            <li><strong>Versioning:</strong> Auto-fill per analisi dettagliata delle versioni</li>
+            <li><strong>Rollback:</strong> Identificazione rapida di modifiche da annullare</li>
+            <li><strong>Statistiche:</strong> I dati del monitoraggio alimentano le analisi statistiche</li>
+            <li><strong>Configurazione:</strong> Stato del sistema e informazioni di connessione</li>
+        </ul>
+    </div>
+    
+    <p><em>Il monitoraggio in tempo reale è fondamentale per mantenere l'integrità e la tracciabilità dei dati. Usa questa funzionalità per avere sempre controllo completo su cosa succede nel tuo database.</em></p>
+</body>
+</html>

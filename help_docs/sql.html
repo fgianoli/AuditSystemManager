@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
+        h1 { color: #2c3e50; border-bottom: 2px solid #3498db; }
+        h2 { color: #34495e; margin-top: 30px; }
+        h3 { color: #7f8c8d; }
+        ul, ol { margin-left: 20px; }
+        li { margin-bottom: 8px; }
+        .feature { background: #ecf0f1; padding: 15px; margin: 15px 0; border-radius: 5px; }
+        .highlight { background: #fff3cd; padding: 10px; border-radius: 4px; }
+        .warning { background: #f8d7da; padding: 10px; border-radius: 4px; border-left: 4px solid #dc3545; }
+        .success { background: #d4edda; padding: 10px; border-radius: 4px; border-left: 4px solid #28a745; }
+        .info { background: #d1ecf1; padding: 10px; border-radius: 4px; border-left: 4px solid #17a2b8; }
+        code { background: #f8f9fa; padding: 2px 6px; border-radius: 3px; font-family: Consolas, monospace; }
+        pre { background: #f8f9fa; padding: 15px; border-radius: 5px; overflow-x: auto; font-family: Consolas, monospace; font-size: 14px; }
+        .sql-function { background: #e8f5e8; padding: 15px; margin: 10px 0; border-radius: 5px; border-left: 4px solid #28a745; }
+        .sql-table { background: #e3f2fd; padding: 15px; margin: 10px 0; border-radius: 5px; border-left: 4px solid #2196f3; }
+        .sql-view { background: #fff3e0; padding: 15px; margin: 10px 0; border-radius: 5px; border-left: 4px solid #ff9800; }
+        table { border-collapse: collapse; width: 100%; margin: 15px 0; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .param { color: #d32f2f; font-weight: bold; }
+        .return { color: #1976d2; font-weight: bold; }
+        .example { background: #f5f5f5; padding: 10px; border-radius: 3px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>Riferimento SQL e Funzioni</h1>
+    
+    <h2>Panoramica Architettura SQL</h2>
+    <p>Il sistema di audit è costruito su una solida architettura PostgreSQL con schema dedicato <code>logging</code>, funzioni SECURITY DEFINER per la sicurezza e trigger automatici per la cattura delle modifiche.</p>
+    
+    <h2>Schema e Tabelle Principali</h2>
+    
+    <h3>Tabella t_history</h3>
+    <div class="sql-table">
+        <h4>Struttura Tabella</h4>
+        <pre>CREATE TABLE logging.t_history (
+    id                 serial PRIMARY KEY,
+    tstamp             timestamp       DEFAULT now(),
+    epoc               float,
+    schemaname         text,
+    tabname            text,
+    operation          text,
+    who                text            DEFAULT current_user,
+    new_val            json,
+    old_val            json,
+    sync               json,
+    -- Extended columns for versioning system
+    version_number     integer,
+    is_current         boolean         DEFAULT true,
+    change_reason      text,
+    user_ip            text,
+    application_name   text            DEFAULT current_setting('application_name')
+);</pre>
+        
+        <h4>Descrizione Campi</h4>
+        <table>
+            <tr>
+                <th>Campo</th>
+                <th>Tipo</th>
+                <th>Descrizione</th>
+                <th>Popolato da</th>
+            </tr>
+            <tr>
+                <td><code>id</code></td>
+                <td>serial</td>
+                <td>Chiave primaria univoca</td>
+                <td>PostgreSQL</td>
+            </tr>
+            <tr>
+                <td><code>tstamp</code></td>
+                <td>timestamp</td>
+                <td>Data/ora della modifica</td>
+                <td>Trigger function</td>
+            </tr>
+            <tr>
+                <td><code>epoc</code></td>
+                <td>float</td>
+                <td>Timestamp Unix epoch</td>
+                <td>Trigger function</td>
+            </tr>
+            <tr>
+                <td><code>schemaname</code></td>
+                <td>text</td>
+                <td>Schema della tabella modificata</td>
+                <td>TG_TABLE_SCHEMA</td>
+            </tr>
+            <tr>
+                <td><code>tabname</code></td>
+                <td>text</td>
+                <td>Nome tabella modificata</td>
+                <td>TG_RELNAME</td>
+            </tr>
+            <tr>
+                <td><code>operation</code></td>
+                <td>text</td>
+                <td>Tipo operazione: INSERT/UPDATE/DELETE</td>
+                <td>TG_OP</td>
+            </tr>
+            <tr>
+                <td><code>who</code></td>
+                <td>text</td>
+                <td>Utente che ha eseguito l'operazione</td>
+                <td>current_user</td>
+            </tr>
+            <tr>
+                <td><code>new_val</code></td>
+                <td>json</td>
+                <td>Dati dopo la modifica</td>
+                <td>row_to_json(NEW)</td>
+            </tr>
+            <tr>
+                <td><code>old_val</code></td>
+                <td>json</td>
+                <td>Dati prima della modifica</td>
+                <td>row_to_json(OLD)</td>
+            </tr>
+            <tr>
+                <td><code>version_number</code></td>
+                <td>integer</td>
+                <td>Numero versione del record</td>
+                <td>get_next_version()</td>
+            </tr>
+            <tr>
+                <td><code>is_current</code></td>
+                <td>boolean</td>
+                <td>Indica se è la versione attuale</td>
+                <td>Trigger logic</td>
+            </tr>
+            <tr>
+                <td><code>change_reason</code></td>
+                <td>text</td>
+                <td>Motivo della modifica</td>
+                <td>set_change_reason()</td>
+            </tr>
+            <tr>
+                <td><code>user_ip</code></td>
+                <td>text</td>
+                <td>Indirizzo IP dell'utente</td>
+                <td>set_user_ip()</td>
+            </tr>
+        </table>
+    </div>
+    
+    <h3>Tabella t_rollback_history</h3>
+    <div class="sql-table">
+        <h4>Struttura Tabella</h4>
+        <pre>CREATE TABLE logging.t_rollback_history (
+    id serial PRIMARY KEY,
+    rollback_timestamp timestamp DEFAULT now(),
+    rollback_user text DEFAULT current_user,
+    target_schema text,
+    target_table text,
+    rollback_reason text,
+    records_affected integer,
+    rollback_to_version integer,
+    rollback_to_timestamp timestamp,
+    success boolean DEFAULT false
+);</pre>
+        
+        <h4>Scopo</h4>
+        <p>Traccia tutte le operazioni di rollback per audit e troubleshooting. Ogni tentativo di rollback viene registrato con esito successo/fallimento.</p>
+    </div>
+    
+    <h2>Indici di Performance</h2>
+    
+    <div class="feature">
+        <h3>Indici Ottimizzati</h3>
+        <pre>-- Indici per query comuni
+CREATE INDEX idx_t_history_tstamp ON logging.t_history (tstamp);
+CREATE INDEX idx_t_history_schema_table ON logging.t_history (schemaname, tabname);
+CREATE INDEX idx_t_history_user ON logging.t_history (who);
+CREATE INDEX idx_t_history_operation ON logging.t_history (operation);
+CREATE INDEX idx_t_history_table_version ON logging.t_history (schemaname, tabname, version_number);
+
+-- Indice parziale per versioni correnti (molto efficiente)
+CREATE INDEX idx_t_history_current ON logging.t_history (schemaname, tabname, is_current) 
+WHERE is_current = true;</pre>
+        
+        <h4>Spiegazione Indici</h4>
+        <ul>
+            <li><strong>tstamp:</strong> Supporta filtri temporali e ordinamenti cronologici</li>
+            <li><strong>schema_table:</strong> Ricerche rapide per tabella specifica</li>
+            <li><strong>user:</strong> Filtri per attività utente</li>
+            <li><strong>operation:</strong> Filtri per tipo operazione</li>
+            <li><strong>table_version:</strong> Ricerche versioni specifiche</li>
+            <li><strong>current (parziale):</strong> Solo versioni correnti, molto efficiente</li>
+        </ul>
+    </div>
+    
+    <h2>Funzioni SECURITY DEFINER</h2>
+    
+    <h3>notify_with_versioning()</h3>
+    <div class="sql-function">
+        <h4>Funzione Principale di Auditing</h4>
+        <pre>CREATE OR REPLACE FUNCTION logging.notify_with_versioning()
+    RETURNS trigger AS
+    $BODY$
+    DECLARE
+        epoc float := extract(epoch from now() at time zone 'utc');
+        next_version integer;
+        change_reason_val text;
+        user_ip_val text;
+    BEGIN
+        -- Get next version number
+        next_version := logging.get_next_version(TG_TABLE_SCHEMA, TG_RELNAME, TG_OP);
+        
+        -- Extract additional metadata if available
+        change_reason_val := current_setting('audit.change_reason', true);
+        user_ip_val := current_setting('audit.user_ip', true);
+        
+        -- Mark previous versions as not current for UPDATE and DELETE
+        IF TG_OP IN ('UPDATE', 'DELETE') THEN
+            UPDATE logging.t_history 
+            SET is_current = false 
+            WHERE schemaname = TG_TABLE_SCHEMA 
+            AND tabname = TG_RELNAME 
+            AND is_current = true;
+        END IF;
+        
+        -- Insert audit record based on operation type
+        IF (TG_OP = 'DELETE') THEN
+            INSERT INTO logging.t_history (epoc, tabname, schemaname, operation, new_val, old_val,
+                version_number, is_current, change_reason, user_ip)
+            VALUES (epoc, TG_RELNAME, TG_TABLE_SCHEMA, TG_OP, 
+                row_to_json(NEW), row_to_json(OLD),
+                next_version, false, change_reason_val, user_ip_val);
+            RETURN OLD;
+        ELSIF (TG_OP = 'UPDATE') THEN
+            INSERT INTO logging.t_history (epoc, tabname, schemaname, operation, new_val, old_val,
+                version_number, is_current, change_reason, user_ip)
+            VALUES (epoc, TG_RELNAME, TG_TABLE_SCHEMA, TG_OP, 
+                row_to_json(NEW), row_to_json(OLD),
+                next_version, true, change_reason_val, user_ip_val);
+            RETURN NEW;
+        ELSIF (TG_OP = 'INSERT') THEN
+            INSERT INTO logging.t_history (epoc, tabname, schemaname, operation, new_val,
+                version_number, is_current, change_reason, user_ip)
+            VALUES (epoc, TG_RELNAME, TG_TABLE_SCHEMA, TG_OP, 
+                row_to_json(NEW), next_version, true, change_reason_val, user_ip_val);
+            RETURN NEW;
+        END IF;
+    END;
+    $BODY$
+    LANGUAGE plpgsql VOLATILE COST 100 SECURITY DEFINER;</pre>
+        
+        <h4>Caratteristiche</h4>
+        <ul>
+            <li><strong>SECURITY DEFINER:</strong> Esegue con privilegi del proprietario</li>
+            <li><strong>Gestione versioni:</strong> Calcola automaticamente numeri versione</li>
+            <li><strong>Metadati estesi:</strong> Cattura motivi e IP se disponibili</li>
+            <li><strong>Stato current:</strong> Gestisce flag is_current correttamente</li>
+        </ul>
+    </div>
+    
+    <h3>get_next_version()</h3>
+    <div class="sql-function">
+        <h4>Calcolo Numero Versione</h4>
+        <pre>CREATE OR REPLACE FUNCTION logging.get_next_version(p_schema text, p_table text, p_operation text)
+RETURNS integer AS
+$BODY$
+DECLARE
+    next_version integer;
+BEGIN
+    -- For INSERT, version is always 1
+    IF p_operation = 'INSERT' THEN
+        RETURN 1;
+    END IF;
+    
+    -- For UPDATE and DELETE, increment existing version
+    SELECT COALESCE(MAX(version_number), 0) + 1
+    INTO next_version
+    FROM logging.t_history
+    WHERE schemaname = p_schema AND tabname = p_table;
+    
+    RETURN next_version;
+END;
+$BODY$
+LANGUAGE plpgsql;</pre>
+        
+        <h4>Logica Versioning</h4>
+        <ul>
+            <li><strong>INSERT:</strong> Sempre versione 1 (primo record)</li>
+            <li><strong>UPDATE/DELETE:</strong> Incrementa la versione massima esistente</li>
+            <li><strong>Gestione NULL:</strong> COALESCE gestisce tabelle senza audit precedente</li>
+        </ul>
+    </div>
+    
+    <h3>set_change_reason()</h3>
+    <div class="sql-function">
+        <h4>Impostazione Motivo Modifica</h4>
+        <pre>CREATE OR REPLACE FUNCTION logging.set_change_reason(reason text)
+RETURNS void AS
+$BODY$
+BEGIN
+    PERFORM set_config('audit.change_reason', reason, false);
+END;
+$BODY$
+LANGUAGE plpgsql SECURITY DEFINER;</pre>
+        
+        <h4>Utilizzo</h4>
+        <div class="example">
+            <pre>-- Imposta motivo prima di una modifica
+SELECT logging.set_change_reason('Correzione coordinate edificio 12345');
+
+-- Esegui la modifica
+UPDATE total.buildings SET x_coord = 1234567.89 WHERE id = '12345';
+
+-- Il motivo sarà automaticamente registrato nel log audit</pre>
+        </div>
+    </div>
+    
+    <h3>set_user_ip()</h3>
+    <div class="sql-function">
+        <h4>Impostazione IP Utente</h4>
+        <pre>CREATE OR REPLACE FUNCTION logging.set_user_ip(ip_address text)
+RETURNS void AS
+$BODY$
+BEGIN
+    PERFORM set_config('audit.user_ip', ip_address, false);
+END;
+$BODY$
+LANGUAGE plpgsql SECURITY DEFINER;</pre>
+        
+        <h4>Utilizzo</h4>
+        <div class="example">
+            <pre>-- Traccia IP dell'utente per compliance
+SELECT logging.set_user_ip('192.168.1.100');
+
+-- Tutte le modifiche successive includeranno questo IP</pre>
+        </div>
+    </div>
+    
+    <h3>get_table_history()</h3>
+    <div class="sql-function">
+        <h4>Recupero Cronologia Tabella</h4>
+        <pre>CREATE OR REPLACE FUNCTION logging.get_table_history(
+    p_schema text, 
+    p_table text, 
+    p_limit integer DEFAULT 100
+)
+RETURNS TABLE (
+    id integer,
+    timestamp_change timestamp,
+    version_number integer,
+    operation text,
+    user_name text,
+    change_reason text,
+    old_values json,
+    new_values json
+) AS
+$BODY$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        h.id,
+        h.tstamp,
+        h.version_number,
+        h.operation,
+        h.who,
+        h.change_reason,
+        h.old_val,
+        h.new_val
+    FROM logging.t_history h
+    WHERE h.schemaname = p_schema 
+    AND h.tabname = p_table
+    ORDER BY h.tstamp DESC, h.version_number DESC
+    LIMIT p_limit;
+END;
+$BODY$
+LANGUAGE plpgsql SECURITY DEFINER;</pre>
+        
+        <h4>Utilizzo</h4>
+        <div class="example">
+            <pre>-- Cronologia completa di una tabella
+SELECT * FROM logging.get_table_history('total', 'buildings');
+
+-- Ultime 50 modifiche
+SELECT * FROM logging.get_table_history('total', 'buildings', 50);</pre>
+        </div>
+    </div>
+    
+    <h2>Funzioni di Rollback</h2>
+    
+    <h3>rollback_record_to_version()</h3>
+    <div class="sql-function">
+        <h4>Rollback Record Singolo</h4>
+        <pre>CREATE OR REPLACE FUNCTION logging.rollback_record_to_version(
+    p_schema text,
+    p_table text, 
+    p_version integer,
+    p_reason text DEFAULT 'Manual rollback'
+)
+RETURNS boolean AS
+$BODY$
+DECLARE
+    record_data json;
+    sql_query text;
+    key_value text;
+    affected_rows integer;
+BEGIN
+    -- Get data from requested version
+    SELECT 
+        CASE WHEN operation = 'DELETE' THEN old_val ELSE new_val END
+    INTO record_data
+    FROM logging.t_history
+    WHERE schemaname = p_schema AND tabname = p_table AND version_number = p_version
+    ORDER BY tstamp DESC LIMIT 1;
+    
+    IF record_data IS NULL THEN
+        RAISE EXCEPTION 'Version % not found for %.%', p_version, p_schema, p_table;
+    END IF;
+    
+    -- Set rollback reason for audit trail
+    PERFORM logging.set_change_reason('ROLLBACK: ' || p_reason);
+    
+    -- Extract primary key value
+    key_value := record_data->>'id';
+    
+    -- Build dynamic UPDATE query
+    sql_query := format('UPDATE %I.%I SET ', p_schema, p_table);
+    
+    SELECT string_agg(
+        format('%I = %s', key, 
+            CASE 
+                WHEN value::text = 'null' THEN 'NULL'
+                WHEN jsonb_typeof(value::jsonb) = 'string' THEN quote_literal(value::text)
+                ELSE value::text
+            END
+        ), ', '
+    ) INTO sql_query
+    FROM json_each(record_data) WHERE key != 'id';
+    
+    sql_query := sql_query || format(' WHERE id = %s', quote_literal(key_value));
+    
+    -- Execute rollback
+    EXECUTE sql_query;
+    GET DIAGNOSTICS affected_rows = ROW_COUNT;
+    
+    -- Log rollback operation
+    INSERT INTO logging.t_rollback_history 
+    (target_schema, target_table, rollback_reason, records_affected, rollback_to_version, success)
+    VALUES (p_schema, p_table, p_reason, affected_rows, p_version, true);
+    
+    RETURN true;
+    
+EXCEPTION WHEN OTHERS THEN
+    -- Log failed rollback
+    INSERT INTO logging.t_rollback_history 
+    (target_schema, target_table, rollback_reason, records_affected, rollback_to_version, success)
+    VALUES (p_schema, p_table, p_reason || ' - ERROR: ' || SQLERRM, 0, p_version, false);
+    
+    RAISE EXCEPTION 'Error during rollback: %', SQLERRM;
+END;
+$BODY$
+LANGUAGE plpgsql SECURITY DEFINER;</pre>
+        
+        <h4>Caratteristiche</h4>
+        <ul>
+            <li><strong>Costruzione dinamica query:</strong> Gestisce qualsiasi struttura tabella</li>
+            <li><strong>Gestione tipi dati:</strong> NULL, stringhe, numeri gestiti correttamente</li>
+            <li><strong>Logging completo:</strong> Successo e fallimenti tracciati</li>
+            <li><strong>Gestione errori:</strong> Rollback transazione automatico su errore</li>
+        </ul>
+    </div>
+    
+    <h3>undo_user_changes()</h3>
+    <div class="sql-function">
+        <h4>Annullamento Modifiche Utente</h4>
+        <pre>CREATE OR REPLACE FUNCTION logging.undo_user_changes(
+    p_user text,
+    p_minutes_ago integer DEFAULT 60,
+    p_reason text DEFAULT 'Undo user modifications',
+    p_dry_run boolean DEFAULT true
+)
+RETURNS text AS
+$BODY$
+DECLARE
+    change_cursor CURSOR FOR
+        SELECT schemaname, tabname, old_val, new_val, operation, tstamp
+        FROM logging.t_history
+        WHERE who = p_user 
+        AND tstamp >= NOW() - (p_minutes_ago || ' minutes')::interval
+        AND operation IN ('UPDATE', 'DELETE')
+        ORDER BY tstamp DESC;
+    
+    sql_query text;
+    counter integer := 0;
+    result_message text;
+BEGIN
+    IF p_dry_run THEN
+        -- Dry run mode: just report what would be done
+        result_message := 'DRY RUN - Changes by ' || p_user || ' that would be undone:' || E'\n';
+        
+        FOR change_row IN change_cursor LOOP
+            result_message := result_message || format('- %s: %s.%s at %s', 
+                change_row.operation, change_row.schemaname, change_row.tabname, change_row.tstamp) || E'\n';
+            counter := counter + 1;
+        END LOOP;
+        
+        result_message := result_message || E'\nTotal changes to undo: ' || counter;
+        
+    ELSE
+        -- Actual execution mode
+        PERFORM logging.set_change_reason('UNDO USER: ' || p_reason);
+        
+        FOR change_row IN change_cursor LOOP
+            IF change_row.operation = 'UPDATE' AND change_row.old_val IS NOT NULL THEN
+                -- Restore previous values for UPDATE
+                sql_query := format('UPDATE %I.%I SET ', change_row.schemaname, change_row.tabname);
+                
+                SELECT string_agg(
+                    format('%I = %s', key, 
+                        CASE 
+                            WHEN value::text = 'null' THEN 'NULL'
+                            WHEN jsonb_typeof(value::jsonb) = 'string' THEN quote_literal(value::text)
+                            ELSE value::text
+                        END
+                    ), ', '
+                ) INTO sql_query
+                FROM json_each(change_row.old_val) WHERE key != 'id';
+                
+                sql_query := sql_query || format(' WHERE id = %s', quote_literal(change_row.old_val->>'id'));
+                
+                EXECUTE sql_query;
+                counter := counter + 1;
+                
+            ELSIF change_row.operation = 'DELETE' AND change_row.old_val IS NOT NULL THEN
+                -- Restore deleted record
+                SELECT 
+                    format('INSERT INTO %I.%I (%s) VALUES (%s)', 
+                        change_row.schemaname, change_row.tabname,
+                        string_agg(quote_ident(key), ', '),
+                        string_agg(
+                            CASE 
+                                WHEN value::text = 'null' THEN 'NULL'
+                                WHEN jsonb_typeof(value::jsonb) = 'string' THEN quote_literal(value::text)
+                                ELSE value::text
+                            END, ', '
+                        )
+                    )
+                INTO sql_query
+                FROM json_each(change_row.old_val);
+                
+                EXECUTE sql_query;
+                counter := counter + 1;
+            END IF;
+        END LOOP;
+        
+        result_message := 'Undo completed. Changes restored: ' || counter;
+    END IF;
+    
+    RETURN result_message;
+END;
+$BODY$
+LANGUAGE plpgsql SECURITY DEFINER;</pre>
+        
+        <h4>Modalità di Funzionamento</h4>
+        <ul>
+            <li><strong>Dry Run (default):</strong> Mostra solo cosa sarebbe fatto</li>
+            <li><strong>Execution Mode:</strong> Esegue effettivamente le modifiche</li>
+            <li><strong>UPDATE handling:</strong> Ripristina valori precedenti</li>
+            <li><strong>DELETE handling:</strong> Riinserisce record eliminati</li>
+            <li><strong>INSERT ignorati:</strong> Non possono essere "annullati"</li>
+        </ul>
+    </div>
+    
+    <h2>Viste Ottimizzate</h2>
+    
+    <h3>v_current_versions</h3>
+    <div class="sql-view">
+        <h4>Vista Versioni Correnti</h4>
+        <pre>CREATE OR REPLACE VIEW logging.v_current_versions AS
+SELECT 
+    schemaname,
+    tabname,
+    version_number,
+    tstamp as last_modified,
+    who as last_modified_by,
+    operation as last_operation,
+    change_reason,
+    new_val as current_data
+FROM logging.t_history
+WHERE is_current = true
+ORDER BY schemaname, tabname;</pre>
+        
+        <h4>Utilizzo</h4>
+        <div class="example">
+            <pre>-- Stato attuale di tutte le tabelle monitorate
+SELECT * FROM logging.v_current_versions;
+
+-- Versioni correnti di uno schema specifico
+SELECT * FROM logging.v_current_versions WHERE schemaname = 'total';</pre>
+        </div>
+    </div>
+    
+    <h3>v_recent_changes</h3>
+    <div class="sql-view">
+        <h4>Vista Modifiche Recenti</h4>
+        <pre>CREATE OR REPLACE VIEW logging.v_recent_changes AS
+SELECT 
+    tstamp,
+    who as user_name,
+    schemaname || '.' || tabname as table_name,
+    operation,
+    version_number,
+    change_reason,
+    CASE 
+        WHEN operation = 'UPDATE' THEN 'Modified'
+        WHEN operation = 'INSERT' THEN 'Created' 
+        WHEN operation = 'DELETE' THEN 'Deleted'
+    END as action_type,
+    old_val->>'id' as record_id
+FROM logging.t_history
+WHERE tstamp >= CURRENT_DATE
+ORDER BY tstamp DESC;</pre>
+        
+        <h4>Utilizzo</h4>
+        <div class="example">
+            <pre>-- Tutte le modifiche di oggi
+SELECT * FROM logging.v_recent_changes;
+
+-- Modifiche di uno specifico utente
+SELECT * FROM logging.v_recent_changes WHERE user_name = 'gis_operator';</pre>
+        </div>
+    </div>
+    
+    <h3>v_rollback_summary</h3>
+    <div class="sql-view">
+        <h4>Vista Riassunto Rollback</h4>
+        <pre>CREATE OR REPLACE VIEW logging.v_rollback_summary AS
+SELECT 
+    rollback_timestamp,
+    rollback_user,
+    target_schema || '.' || target_table as table_name,
+    rollback_reason,
+    records_affected,
+    success
+FROM logging.t_rollback_history
+ORDER BY rollback_timestamp DESC;</pre>
+        
+        <h4>Utilizzo</h4>
+        <div class="example">
+            <pre>-- Cronologia completa rollback
+SELECT * FROM logging.v_rollback_summary;
+
+-- Solo rollback falliti per troubleshooting
+SELECT * FROM logging.v_rollback_summary WHERE success = false;</pre>
+        </div>
+    </div>
+    
+    <h2>Query Utili per Analisi</h2>
+    
+    <h3>Query di Monitoraggio</h3>
+    <div class="feature">
+        <h4>Attività per Utente</h4>
+        <pre>-- Attività dettagliata per utente nell'ultima settimana
+SELECT 
+    who as user_name,
+    schemaname,
+    COUNT(*) as total_changes,
+    COUNT(CASE WHEN operation = 'INSERT' THEN 1 END) as inserts,
+    COUNT(CASE WHEN operation = 'UPDATE' THEN 1 END) as updates,
+    COUNT(CASE WHEN operation = 'DELETE' THEN 1 END) as deletes,
+    MIN(tstamp) as first_change,
+    MAX(tstamp) as last_change
+FROM logging.t_history 
+WHERE tstamp >= CURRENT_DATE - INTERVAL '7 days'
+GROUP BY who, schemaname
+ORDER BY total_changes DESC;</pre>
+        
+        <h4>Modifiche per Orario</h4>
+        <pre>-- Distribuzione modifiche per ora del giorno
+SELECT 
+    EXTRACT(hour FROM tstamp) as hour_of_day,
+    COUNT(*) as changes_count,
+    COUNT(DISTINCT who) as unique_users,
+    COUNT(CASE WHEN operation = 'DELETE' THEN 1 END) as deletes
+FROM logging.t_history 
+WHERE tstamp >= CURRENT_DATE - INTERVAL '30 days'
+GROUP BY EXTRACT(hour FROM tstamp)
+ORDER BY hour_of_day;</pre>
+        
+        <h4>Tabelle Più Modificate</h4>
+        <pre>-- Top 20 tabelle per numero di modifiche
+SELECT 
+    schemaname||'.'||tabname as table_name,
+    COUNT(*) as total_changes,
+    COUNT(DISTINCT who) as users_involved,
+    MAX(tstamp) as last_modified,
+    COUNT(CASE WHEN operation = 'DELETE' THEN 1 END) as delete_count
+FROM logging.t_history 
+WHERE tstamp >= CURRENT_DATE - INTERVAL '30 days'
+GROUP BY schemaname, tabname
+ORDER BY total_changes DESC
+LIMIT 20;</pre>
+    </div>
+    
+    <h3>Query di Versioning</h3>
+    <div class="feature">
+        <h4>Cronologia Record Specifico</h4>
+        <pre>-- Cronologia completa di un record con tutte le versioni
+SELECT 
+    version_number,
+    tstamp,
+    who,
+    operation,
+    change_reason,
+    is_current,
+    -- Estrae campo specifico per confronto facile
+    old_val->>'nome' as old_name,
+    new_val->>'nome' as new_name
+FROM logging.t_history 
+WHERE schemaname = 'total' 
+AND tabname = 'buildings'
+AND (old_val->>'id' = '12345' OR new_val->>'id' = '12345')
+ORDER BY version_number;</pre>
+        
+        <h4>Confronto Versioni</h4>
+        <pre>-- Confronto diretto tra due versioni specifiche
+WITH version_data AS (
+    SELECT 
+        version_number,
+        CASE WHEN operation = 'DELETE' THEN old_val ELSE new_val END as data
+    FROM logging.t_history 
+    WHERE schemaname = 'total' AND tabname = 'buildings'
+    AND version_number IN (2, 5)
+    AND (old_val->>'id' = '12345' OR new_val->>'id' = '12345')
+)
+SELECT 
+    v2.data as version_2_data,
+    v5.data as version_5_data
+FROM 
+    (SELECT data FROM version_data WHERE version_number = 2) v2
+    CROSS JOIN
+    (SELECT data FROM version_data WHERE version_number = 5) v5;</pre>
+    </div>
+    
+    <h3>Query di Audit e Compliance</h3>
+    <div class="feature">
+        <h4>Report Modifiche Periodo</h4>
+        <pre>-- Report compliance per periodo specifico
+SELECT 
+    DATE(tstamp) as modification_date,
+    schemaname,
+    COUNT(*) as daily_changes,
+    COUNT(DISTINCT who) as users_active,
+    COUNT(DISTINCT tabname) as tables_modified,
+    COUNT(CASE WHEN change_reason IS NULL THEN 1 END) as unreasoned_changes
+FROM logging.t_history 
+WHERE tstamp BETWEEN '2025-07-01' AND '2025-07-31'
+GROUP BY DATE(tstamp), schemaname
+ORDER BY modification_date, schemaname;</pre>
+        
+        <h4>Modifiche Senza Motivo</h4>
+        <pre>-- Identifica modifiche senza motivo specificato
+SELECT 
+    tstamp,
+    who,
+    schemaname||'.'||tabname as table_name,
+    operation,
+    old_val->>'id' as record_id
+FROM logging.t_history 
+WHERE change_reason IS NULL 
+AND tstamp >= CURRENT_DATE - INTERVAL '7 days'
+AND operation IN ('UPDATE', 'DELETE')  -- INSERT spesso legittimi senza motivo
+ORDER BY tstamp DESC;</pre>
+        
+        <h4>Attività Fuori Orario</h4>
+        <pre>-- Modifiche durante orari non lavorativi
+SELECT 
+    tstamp,
+    who,
+    schemaname||'.'||tabname as table_name,
+    operation,
+    change_reason
+FROM logging.t_history 
+WHERE (
+    EXTRACT(hour FROM tstamp) NOT BETWEEN 8 AND 18 
+    OR EXTRACT(dow FROM tstamp) IN (0, 6)  -- Weekend
+)
+AND tstamp >= CURRENT_DATE - INTERVAL '30 days'
+ORDER BY tstamp DESC;</pre>
+    </div>
+    
+    <h2>Query di Performance e Manutenzione</h2>
+    
+    <h3>Analisi Dimensioni Log</h3>
+    <div class="feature">
+        <pre>-- Analisi crescita log audit per schema
+SELECT 
+    schemaname,
+    COUNT(*) as total_records,
+    pg_size_pretty(
+        COUNT(*) * 
+        (SELECT pg_column_size(h) FROM logging.t_history h LIMIT 1)
+    ) as estimated_size,
+    MIN(tstamp) as oldest_record,
+    MAX(tstamp) as newest_record,
+    COUNT(*) / EXTRACT(days FROM (MAX(tstamp) - MIN(tstamp)) + INTERVAL '1 day') as avg_records_per_day
+FROM logging.t_history 
+GROUP BY schemaname
+ORDER BY COUNT(*) DESC;</pre>
+        
+        <h4>Statistiche Tabella Audit</h4>
+        <pre>-- Informazioni complete sulla tabella t_history
+SELECT 
+    schemaname||'.'||tabname as table_name,
+    COUNT(*) as audit_records,
+    AVG(EXTRACT(epoch FROM (tstamp - LAG(tstamp) OVER (PARTITION BY schemaname, tabname ORDER BY tstamp)))) as avg_seconds_between_changes,
+    pg_size_pretty(
+        (SELECT pg_total_relation_size(schemaname||'.'||tabname))
+    ) as table_size
+FROM logging.t_history 
+WHERE tstamp >= CURRENT_DATE - 7
+GROUP BY schemaname, tabname
+ORDER BY audit_records DESC;</pre>
+    </div>
+    
+    <h3>Query di Archiviazione</h3>
+    <div class="feature">
+        <h4>Archiviazione Dati Vecchi</h4>
+        <pre>-- Creare tabella archivio per dati audit vecchi
+CREATE TABLE logging.t_history_archive (LIKE logging.t_history INCLUDING ALL);
+
+-- Spostare record vecchi in archivio (più di 1 anno)
+WITH archived_records AS (
+    DELETE FROM logging.t_history 
+    WHERE tstamp < CURRENT_DATE - INTERVAL '1 year'
+    RETURNING *
+)
+INSERT INTO logging.t_history_archive 
+SELECT * FROM archived_records;
+
+-- Statistiche archivio
+SELECT 
+    'Current' as table_type,
+    COUNT(*) as record_count,
+    MIN(tstamp) as oldest_record,
+    MAX(tstamp) as newest_record,
+    pg_size_pretty(pg_total_relation_size('logging.t_history')) as size
+FROM logging.t_history
+UNION ALL
+SELECT 
+    'Archive',
+    COUNT(*),
+    MIN(tstamp),
+    MAX(tstamp),
+    pg_size_pretty(pg_total_relation_size('logging.t_history_archive'))
+FROM logging.t_history_archive;</pre>
+    </div>
+    
+    <h2>Best Practices SQL</h2>
+    
+    <h3>Ottimizzazione Query</h3>
+    <div class="success">
+        <h4>Performance Tips</h4>
+        <ul>
+            <li><strong>Usa sempre filtri temporali:</strong> <code>WHERE tstamp >= CURRENT_DATE - INTERVAL '7 days'</code></li>
+            <li><strong>Sfrutta indici esistenti:</strong> Filtra per schemaname, tabname, who quando possibile</li>
+            <li><strong>Limita risultati:</strong> Usa <code>LIMIT</code> per query esplorative</li>
+            <li><strong>JSON queries efficienti:</strong> <code>old_val->>'id'</code> è più veloce di <code>json_extract_path_text(old_val, 'id')</code></li>
+            <li><strong>Indice parziale:</strong> Sfrutta <code>idx_t_history_current</code> per versioni correnti</li>
+        </ul>
+    </div>
+    
+    <h3>Sicurezza Query</h3>
+    <div class="warning">
+        <h4>Considerazioni Sicurezza</h4>
+        <ul>
+            <li><strong>Usa parametri:</strong> Mai concatenare stringhe in SQL dinamico</li>
+            <li><strong>Validazione input:</strong> Controlla nomi schema/tabella prima dell'uso</li>
+            <li><strong>Privilegi minimi:</strong> Grant solo SELECT su viste per utenti normali</li>
+            <li><strong>Audit accessi:</strong> Monitora chi accede ai dati di audit</li>
+            <li><strong>Dati sensibili:</strong> Considera mascheramento dati in JSON per compliance</li>
+        </ul>
+    </div>
+    
+    <h3>Manutenzione Routine</h3>
+    <div class="info">
+        <h4>Tasks Periodici</h4>
+        <ul>
+            <li><strong>Analyze mensile:</strong> <code>ANALYZE logging.t_history;</code></li>
+            <li><strong>Vacuum periodico:</strong> <code>VACUUM ANALYZE logging.t_history;</code></li>
+            <li><strong>Monitoring crescita:</strong> Controlla dimensioni tabelle audit</li>
+            <li><strong>Archiviazione:</strong> Sposta dati vecchi in tabelle archivio</li>
+            <li><strong>Index maintenance:</strong> Ricostruisci indici se necessario</li>
+        </ul>
+    </div>
+    
+    <p><em>Questo riferimento SQL fornisce una base completa per interagire direttamente con il sistema di audit. Adatta le query alle tue specifiche esigenze e sempre testa su ambienti di sviluppo prima dell'uso in produzione.</em></p>
+</body>
+</html>

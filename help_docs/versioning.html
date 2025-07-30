@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
+        h1 { color: #2c3e50; border-bottom: 2px solid #3498db; }
+        h2 { color: #34495e; margin-top: 30px; }
+        h3 { color: #7f8c8d; }
+        ul, ol { margin-left: 20px; }
+        li { margin-bottom: 8px; }
+        .feature { background: #ecf0f1; padding: 15px; margin: 15px 0; border-radius: 5px; }
+        .highlight { background: #fff3cd; padding: 10px; border-radius: 4px; }
+        .warning { background: #f8d7da; padding: 10px; border-radius: 4px; border-left: 4px solid #dc3545; }
+        .success { background: #d4edda; padding: 10px; border-radius: 4px; border-left: 4px solid #28a745; }
+        .info { background: #d1ecf1; padding: 10px; border-radius: 4px; border-left: 4px solid #17a2b8; }
+        code { background: #f8f9fa; padding: 2px 6px; border-radius: 3px; font-family: Consolas, monospace; }
+        .step { background: #e9ecef; padding: 10px; margin: 10px 0; border-left: 4px solid #6c757d; }
+        table { border-collapse: collapse; width: 100%; margin: 15px 0; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <h1>Sistema di Versioning Avanzato</h1>
+    
+    <h2>Panoramica del Versioning</h2>
+    <p>Il tab <strong>Versioning</strong> fornisce gestione completa delle versioni dei record, permettendo di tracciare l'evoluzione di ogni singolo record nel tempo con capacità di confronto avanzate e analisi dettagliate delle modifiche.</p>
+    
+    <h2>Architettura del Versioning</h2>
+    
+    <div class="feature">
+        <h3>Sistema di Numerazione Versioni</h3>
+        <ul>
+            <li><strong>Versione 1:</strong> Sempre assegnata ai nuovi record (INSERT)</li>
+            <li><strong>Versioni incrementali:</strong> Ogni UPDATE/DELETE incrementa il numero versione</li>
+            <li><strong>Flag is_current:</strong> Identifica la versione attiva del record</li>
+            <li><strong>Cronologia completa:</strong> Tutte le versioni sono mantenute per tracciabilità</li>
+        </ul>
+    </div>
+    
+    <div class="highlight">
+        <h3>Rilevamento ID Intelligente</h3>
+        <p>Il sistema supporta automaticamente diversi tipi di campi identificativi:</p>
+        <ul>
+            <li><code>id</code>, <code>gid</code>, <code>fid</code>, <code>objectid</code>, <code>oid</code>, <code>pk</code>, <code>_id</code></li>
+            <li>Campi che terminano con 'id'</li>
+            <li>Chiavi primarie rilevate automaticamente dallo schema</li>
+            <li>Algoritmo di fallback con priorità intelligenti</li>
+        </ul>
+    </div>
+    
+    <h2>Interfaccia di Ricerca Versioni</h2>
+    
+    <h3>Sezione Ricerca Record</h3>
+    <div class="feature">
+        <table>
+            <tr>
+                <th>Campo</th>
+                <th>Descrizione</th>
+                <th>Esempi</th>
+            </tr>
+            <tr>
+                <td><strong>Schema</strong></td>
+                <td>Schema del database contenente la tabella</td>
+                <td>total, office_data, old_city, sectorial</td>
+            </tr>
+            <tr>
+                <td><strong>Table</strong></td>
+                <td>Nome della tabella da analizzare</td>
+                <td>buildings, roads, parcels</td>
+            </tr>
+            <tr>
+                <td><strong>Record ID</strong></td>
+                <td>Identificativo del record specifico</td>
+                <td>123, ABC-456, GUID</td>
+            </tr>
+        </table>
+    </div>
+    
+    <div class="step">
+        <h4>Processo di Ricerca</h4>
+        <ol>
+            <li>Seleziona lo <strong>Schema</strong> dal dropdown</li>
+            <li>Inserisci il nome della <strong>Tabella</strong> (senza schema prefix)</li>
+            <li>Inserisci l'<strong>ID del record</strong> da analizzare</li>
+            <li>Clicca <strong>Search Versions</strong> per eseguire la ricerca</li>
+        </ol>
+    </div>
+    
+    <div class="info">
+        <h4>Auto-fill da Monitoraggio</h4>
+        <p>Puoi auto-compilare la ricerca usando il menu contestuale del tab Monitoraggio:</p>
+        <ul>
+            <li>Clicca destro su una riga nel tab Monitoraggio</li>
+            <li>Seleziona "Auto-fill Versioning Search"</li>
+            <li>Il sistema compilera automaticamente schema, tabella e ID</li>
+        </ul>
+    </div>
+    
+    <h2>Tabella Versioni</h2>
+    
+    <h3>Colonne della Tabella</h3>
+    <div class="feature">
+        <table>
+            <tr>
+                <th>Colonna</th>
+                <th>Descrizione</th>
+                <th>Valori</th>
+            </tr>
+            <tr>
+                <td><strong>Version</strong></td>
+                <td>Numero progressivo della versione</td>
+                <td>1, 2, 3, ...</td>
+            </tr>
+            <tr>
+                <td><strong>Date/Time</strong></td>
+                <td>Timestamp della modifica</td>
+                <td>DD/MM/YYYY HH:MM:SS</td>
+            </tr>
+            <tr>
+                <td><strong>User</strong></td>
+                <td>Utente che ha eseguito la modifica</td>
+                <td>Nome utente database</td>
+            </tr>
+            <tr>
+                <td><strong>Action</strong></td>
+                <td>Tipo di operazione</td>
+                <td>INSERT, UPDATE, DELETE</td>
+            </tr>
+            <tr>
+                <td><strong>Reason</strong></td>
+                <td>Motivo della modifica</td>
+                <td>Testo libero o "-" se non specificato</td>
+            </tr>
+            <tr>
+                <td><strong>Current</strong></td>
+                <td>Indica se è la versione attiva</td>
+                <td>Yes/No</td>
+            </tr>
+            <tr>
+                <td><strong>Data</strong></td>
+                <td>Riassunto dei dati JSON</td>
+                <td>"JSON (X fields)" o "No Data"</td>
+            </tr>
+            <tr>
+                <td><strong>Actions</strong></td>
+                <td>Azioni disponibili</td>
+                <td>Placeholder per azioni future</td>
+            </tr>
+        </table>
+    </div>
+    
+    <h3>Interpretazione dei Risultati</h3>
+    
+    <div class="success">
+        <h4>Record Normale (non eliminato)</h4>
+        <ul>
+            <li>L'ultima versione ha <strong>Current = Yes</strong></li>
+            <li>Le versioni precedenti hanno <strong>Current = No</strong></li>
+            <li>Ogni versione mostra i dati al momento della modifica</li>
+        </ul>
+    </div>
+    
+    <div class="warning">
+        <h4>Record Eliminato</h4>
+        <ul>
+            <li>L'ultima operazione è <strong>DELETE</strong></li>
+            <li>La versione DELETE ha <strong>Current = No</strong></li>
+            <li>I dati della versione DELETE mostrano l'ultimo stato prima dell'eliminazione</li>
+        </ul>
+    </div>
+    
+    <h2>Confronto Versioni</h2>
+    
+    <h3>Selezione Versioni per Confronto</h3>
+    <div class="feature">
+        <p>Dopo aver caricato le versioni di un record:</p>
+        <ul>
+            <li>I dropdown <strong>Version 1</strong> e <strong>Version 2</strong> vengono popolati automaticamente</li>
+            <li>Seleziona due versioni diverse da confrontare</li>
+            <li>Clicca <strong>Compare</strong> per aprire la finestra di confronto</li>
+        </ul>
+    </div>
+    
+    <h3>Finestra di Confronto</h3>
+    
+    <div class="feature">
+        <h4>Sezioni della Finestra</h4>
+        <ul>
+            <li><strong>Header Informativo:</strong> Schema, tabella, ID record, dettagli delle versioni</li>
+            <li><strong>Vista Affiancata:</strong> Dati JSON formattati per entrambe le versioni</li>
+            <li><strong>Analisi Differenze:</strong> Elenco campo per campo delle modifiche</li>
+        </ul>
+    </div>
+    
+    <div class="step">
+        <h4>Lettura delle Differenze</h4>
+        <p>La sezione "Field-by-field Differences" mostra:</p>
+        <ul>
+            <li><strong>Campi modificati:</strong> Nome campo seguito da valori vecchi e nuovi</li>
+            <li><strong>Campi aggiunti:</strong> Presenti solo in una versione (mostrato come &lt;MISSING&gt;)</li>
+            <li><strong>Campi rimossi:</strong> Presenti solo nell'altra versione</li>
+            <li><strong>Messaggi speciali:</strong> "No differences found" se le versioni sono identiche</li>
+        </ul>
+    </div>
+    
+    <h2>Casi d'Uso del Versioning</h2>
+    
+    <h3>Analisi Evoluzione Record</h3>
+    <div class="success">
+        <h4>Scenario: Tracciamento Modifiche Edificio</h4>
+        <ol>
+            <li><strong>Ricerca:</strong> Schema "total", Tabella "buildings", ID "12345"</li>
+            <li><strong>Risultati:</strong>
+                <ul>
+                    <li>Versione 1 (INSERT): Edificio creato con dati base</li>
+                    <li>Versione 2 (UPDATE): Aggiunta altezza e numero piani</li>
+                    <li>Versione 3 (UPDATE): Correzione indirizzo</li>
+                    <li>Versione 4 (UPDATE): Aggiornamento stato di conservazione</li>
+                </ul>
+            </li>
+            <li><strong>Analisi:</strong> Confronto versione 1 e 4 mostra evoluzione completa</li>
+        </ol>
+    </div>
+    
+    <h3>Investigazione Errori</h3>
+    <div class="info">
+        <h4>Scenario: Record Danneggiato</h4>
+        <ol>
+            <li><strong>Problema:</strong> Un edificio ha coordinate errate</li>
+            <li><strong>Investigazione:</strong> Cerca versioni del record</li>
+            <li><strong>Identificazione:</strong> Confronta l'ultima versione buona con quella corrotta</li>
+            <li><strong>Soluzione:</strong> Identifica esattamente quali campi sono stati modificati erroneamente</li>
+        </ol>
+    </div>
+    
+    <h3>Audit e Compliance</h3>
+    <div class="feature">
+        <h4>Scenario: Controllo Modifiche Sensibili</h4>
+        <ul>
+            <li><strong>Requisito:</strong> Documentare tutte le modifiche a parcelle catastali</li>
+            <li><strong>Processo:</strong> 
+                <ol>
+                    <li>Identifica parcella da verificare</li>
+                    <li>Carica cronologia completa delle versioni</li>
+                    <li>Documenta chi, quando e cosa ha modificato</li>
+                    <li>Verifica che i motivi delle modifiche siano documentati</li>
+                </ol>
+            </li>
+            <li><strong>Report:</strong> Export dei dati per audit esterni</li>
+        </ul>
+    </div>
+    
+    <h2>Risoluzione Problemi</h2>
+    
+    <h3>Nessun Risultato Trovato</h3>
+    <div class="warning">
+        <h4>Possibili Cause e Soluzioni</h4>
+        <ul>
+            <li><strong>ID non corretto:</strong> Verifica l'ID nel tab Monitoraggio</li>
+            <li><strong>Tipo campo ID non supportato:</strong> Usa "Show Record Details" per vedere campi disponibili</li>
+            <li><strong>Record non monitorato:</strong> Verifica che la tabella abbia trigger di audit attivi</li>
+            <li><strong>Schema/tabella errati:</strong> Controlla l'ortografia e la disponibilità</li>
+        </ul>
+    </div>
+    
+    <div class="info">
+        <h4>Messaggio di Debug</h4>
+        <p>Il sistema mostra quali campi ID ha tentato:</p>
+        <ul>
+            <li>Lista dei campi provati: id, gid, fid, objectid, oid, pk, _id</li>
+            <li>Suggerimento di usare "Show Record Details" per analisi manuale</li>
+            <li>Indicazione del campo ID rilevato con successo</li>
+        </ul>
+    </div>
+    
+    <h3>Dati JSON Mancanti o Corrotti</h3>
+    <div class="warning">
+        <h4>Gestione Errori Dati</h4>
+        <ul>
+            <li><strong>JSON non valido:</strong> Mostrato come "JSON Data" generico</li>
+            <li><strong>Dati nulli:</strong> Mostrato come "No Data"</li>
+            <li><strong>Errori parsing:</strong> Gestiti gracefully con messaggio di errore</li>
+        </ul>
+    </div>
+    
+    <h2>Integrazione con Altri Tab</h2>
+    
+    <h3>Flusso di Lavoro Integrato</h3>
+    <div class="feature">
+        <h4>Dal Monitoraggio al Versioning</h4>
+        <ol>
+            <li>Identifica record interessante nel tab <strong>Monitoraggio</strong></li>
+            <li>Usa menu contestuale "Auto-fill Versioning Search"</li>
+            <li>Il sistema compila automaticamente i campi di ricerca</li>
+            <li>Passa automaticamente al tab <strong>Versioning</strong></li>
+            <li>Esegui ricerca per vedere cronologia completa</li>
+        </ol>
+    </div>
+    
+    <h3>Dal Versioning al Rollback</h3>
+    <div class="step">
+        <h4>Preparazione Rollback</h4>
+        <ol>
+            <li>Identifica versione target nel tab <strong>Versioning</strong></li>
+            <li>Nota il numero versione e i dettagli della modifica</li>
+            <li>Passa al tab <strong>Rollback</strong></li>
+            <li>Compila manualmente schema, tabella, versione</li>
+            <li>Fornisci motivo dettagliato per il rollback</li>
+        </ol>
+    </div>
+    
+    <h2>Ottimizzazione Performance</h2>
+    
+    <h3>Query Efficienti</h3>
+    <div class="feature">
+        <h4>Strategia di Ricerca</h4>
+        <ul>
+            <li><strong>Ricerca ID mirata:</strong> Testa multipli campi ID in ordine priorità</li>
+            <li><strong>Indici ottimizzati:</strong> Utilizza indici su schema, tabella, versione</li>
+            <li><strong>Limit implicito:</strong> Risultati ordinati per versione decrescente</li>
+            <li><strong>JOIN efficienti:</strong> Combina controlli JSON con validazione NOT NULL</li>
+        </ul>
+    </div>
+    
+    <h3>Gestione Memoria</h3>
+    <div class="info">
+        <h4>Ottimizzazioni Interface</h4>
+        <ul>
+            <li><strong>Lazy loading:</strong> Dati JSON caricati solo quando necessario</li>
+            <li><strong>Riassunti compatti:</strong> Mostra "JSON (X fields)" invece di dati completi</li>
+            <li><strong>Cleanup automatico:</strong> Combos versioni resettate ad ogni ricerca</li>
+        </ul>
+    </div>
+    
+    <h2>Best Practices</h2>
+    
+    <h3>Ricerca Efficace</h3>
+    <div class="success">
+        <ul>
+            <li><strong>Usa auto-fill:</strong> Più accurato della compilazione manuale</li>
+            <li><strong>Verifica ID:</strong> Controlla che l'ID sia corretto prima della ricerca</li>
+            <li><strong>Documenta motivi:</strong> Sempre fornire motivi per modifiche importanti</li>
+            <li><strong>Pattern di naming:</strong> Usa convenzioni consistenti per tabelle e campi</li>
+        </ul>
+    </div>
+    
+    <h3>Analisi Versioni</h3>
+    <div class="feature">
+        <ul>
+            <li><strong>Confronti mirati:</strong> Confronta versioni significative, non consecutive</li>
+            <li><strong>Documentazione:</strong> Salva screenshot dei confronti per audit</li>
+            <li><strong>Pattern temporali:</strong> Cerca pattern nelle modifiche (orari, utenti)</li>
+            <li><strong>Correlazioni:</strong> Analizza modifiche multiple dello stesso utente/periodo</li>
+        </ul>
+    </div>
+    
+    <h3>Manutenzione Sistema</h3>
+    <div class="highlight">
+        <ul>
+            <li><strong>Monitoraggio ID detection:</strong> Controlla tassi successo rilevamento</li>
+            <li><strong>Performance query:</strong> Monitora tempi risposta ricerche versioni</li>
+            <li><strong>Crescita dati:</strong> Pianifica archiviazione versioni vecchie</li>
+            <li><strong>Training utenti:</strong> Educa sulla corretta compilazione motivi modifiche</li>
+        </ul>
+    </div>
+    
+    <p><em>Il sistema di versioning fornisce trasparenza completa sull'evoluzione dei dati. Utilizzalo sistematicamente per mantenere controllo e tracciabilità di tutte le modifiche critiche.</em></p>
+</body>
+</html>

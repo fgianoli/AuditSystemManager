@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
+        h1 { color: #2c3e50; border-bottom: 2px solid #3498db; }
+        h2 { color: #34495e; margin-top: 30px; }
+        h3 { color: #7f8c8d; }
+        ul, ol { margin-left: 20px; }
+        li { margin-bottom: 8px; }
+        .feature { background: #ecf0f1; padding: 15px; margin: 15px 0; border-radius: 5px; }
+        .highlight { background: #fff3cd; padding: 10px; border-radius: 4px; }
+        .warning { background: #f8d7da; padding: 10px; border-radius: 4px; border-left: 4px solid #dc3545; }
+        .success { background: #d4edda; padding: 10px; border-radius: 4px; border-left: 4px solid #28a745; }
+        .info { background: #d1ecf1; padding: 10px; border-radius: 4px; border-left: 4px solid #17a2b8; }
+        code { background: #f8f9fa; padding: 2px 6px; border-radius: 3px; font-family: Consolas, monospace; }
+        pre { background: #f8f9fa; padding: 15px; border-radius: 5px; overflow-x: auto; }
+        .step { background: #e9ecef; padding: 10px; margin: 10px 0; border-left: 4px solid #6c757d; }
+    </style>
+</head>
+<body>
+    <h1>Configurazione e Setup del Sistema</h1>
+    
+    <h2>Panoramica</h2>
+    <p>Il sistema di configurazione fornisce controllo completo sull'installazione, setup e gestione dell'audit system con funzioni <strong>SECURITY DEFINER</strong> migliorate per un adeguato isolamento dei privilegi.</p>
+    
+    <h2>Processo di Setup</h2>
+    
+    <div class="step">
+        <h3>Passo 1: Accesso alla Configurazione</h3>
+        <ol>
+            <li>Apri il plugin Audit System Manager</li>
+            <li>Vai al tab <strong>Configurazione</strong></li>
+            <li>Clicca il pulsante <strong>Setup Audit System</strong></li>
+            <li>Si aprirà la finestra di setup con tre tab principali</li>
+        </ol>
+    </div>
+    
+    <h2>Tab della Finestra di Setup</h2>
+    
+    <h3>Installazione Sistema</h3>
+    <p>Questo tab gestisce l'installazione del core audit system con sicurezza avanzata:</p>
+    
+    <div class="feature">
+        <h4>Componenti di Installazione</h4>
+        <ul>
+            <li><strong>Schema logging:</strong> Schema dedicato per tabelle e funzioni di audit</li>
+            <li><strong>Tabella t_history:</strong> Log principale di audit con versioning e rilevamento ID migliorato</li>
+            <li><strong>Tabella t_rollback_history:</strong> Traccia tutte le operazioni di rollback con stato successo/fallimento</li>
+            <li><strong>Funzioni trigger SECURITY DEFINER:</strong> notify_with_versioning() con isolamento privilegi appropriato</li>
+            <li><strong>Funzioni di utilità migliorate:</strong> set_change_reason(), get_table_history(), set_user_ip()</li>
+            <li><strong>Funzioni rollback sicure:</strong> rollback_record_to_version(), undo_user_changes()</li>
+            <li><strong>Viste ottimizzate per performance:</strong> v_recent_changes, v_current_versions, v_rollback_summary</li>
+            <li><strong>Indici avanzati:</strong> Ottimizzati per pattern di query comuni</li>
+        </ul>
+    </div>
+    
+    <div class="highlight">
+        <h4>Miglioramenti SECURITY DEFINER</h4>
+        <ul>
+            <li><strong>Isolamento Privilegi:</strong> Gli utenti possono fare audit senza privilegi diretti sulle tabelle</li>
+            <li><strong>Sicurezza Centralizzata:</strong> Tutta la sicurezza gestita tramite ownership delle funzioni</li>
+            <li><strong>Protezione SQL Injection:</strong> Validazione e sanitizzazione input integrate</li>
+            <li><strong>Accesso Basato su Ruoli:</strong> Funzioni di rollback limitate ai ruoli admin</li>
+        </ul>
+    </div>
+    
+    <div class="step">
+        <h4>Processo di Installazione</h4>
+        <ol>
+            <li><strong>Controllo Stato:</strong> Il sistema verifica automaticamente se l'audit system esiste</li>
+            <li><strong>Installa:</strong> Clicca "Install Audit System" per il setup iniziale</li>
+            <li><strong>Reinstalla:</strong> Clicca "Reinstall/Update System" per aggiornare installazione esistente</li>
+            <li><strong>Monitora Log:</strong> Osserva il progresso dell'installazione nell'area log</li>
+            <li><strong>Verifica Sicurezza:</strong> Conferma che le funzioni SECURITY DEFINER siano installate correttamente</li>
+        </ol>
+    </div>
+    
+    <div class="info">
+        <h4>Indicatori di Stato</h4>
+        <ul>
+            <li><span style="color: green;">●</span> <strong>Verde:</strong> Audit system installato e pronto</li>
+            <li><span style="color: orange;">●</span> <strong>Arancione:</strong> Audit system parzialmente installato</li>
+            <li><span style="color: red;">●</span> <strong>Rosso:</strong> Audit system non installato</li>
+        </ul>
+    </div>
+    
+    <h3>Configurazione Monitoraggio</h3>
+    <p>Questo tab gestisce quali schemi e tabelle sono monitorati con rilevamento ID migliorato:</p>
+    
+    <div class="feature">
+        <h4>Gestione Schemi</h4>
+        <ul>
+            <li><strong>Schemi Disponibili:</strong> Elenca tutti gli schemi del database (escludendo schemi di sistema)</li>
+            <li><strong>Schemi Monitorati:</strong> Mostra gli schemi attualmente monitorati</li>
+            <li><strong>Aggiungi Schema:</strong> Seleziona dalla lista disponibile e clicca "Add Schema →"</li>
+            <li><strong>Rimuovi Schema:</strong> Seleziona dalla lista monitorata e clicca "← Remove Schema"</li>
+            <li><strong>Rilevamento Intelligente:</strong> Rileva automaticamente chiavi primarie e campi ID</li>
+        </ul>
+    </div>
+    
+    <div class="step">
+        <h4>Controllo Specifico per Tabella</h4>
+        <p>Per controllo granulare su singole tabelle:</p>
+        <ol>
+            <li>Seleziona <strong>Schema</strong> dal dropdown</li>
+            <li>Seleziona <strong>Tabella</strong> dal dropdown (auto-popolato in base allo schema)</li>
+            <li>Clicca <strong>Add Single Table</strong> per aggiungere tabella specifica</li>
+            <li>Il sistema rileva automaticamente i campi ID ottimali per la tabella</li>
+        </ol>
+    </div>
+    
+    <div class="step">
+        <h4>Applicazione Configurazione</h4>
+        <ol>
+            <li><strong>Anteprima Modifiche:</strong> Clicca "Preview Changes" per vedere SQL che sarà eseguito</li>
+            <li><strong>Applica Configurazione:</strong> Clicca "Apply Configuration" per attivare il monitoraggio</li>
+            <li><strong>Monitora Progresso:</strong> Osserva il log di configurazione per i risultati</li>
+            <li><strong>Verifica Trigger:</strong> Conferma che il monitoraggio sia attivo e il rilevamento ID funzioni</li>
+        </ol>
+    </div>
+    
+    <h3>Stato e Verifica</h3>
+    <p>Questo tab fornisce monitoraggio completo dello stato di salute del sistema e verifica:</p>
+    
+    <div class="feature">
+        <h4>Tabella Stato Monitoraggio</h4>
+        <p>Mostra lo stato attuale del monitoraggio per ogni schema:</p>
+        <ul>
+            <li><strong>Schema:</strong> Nome dello schema</li>
+            <li><strong>Tables Monitored:</strong> Numero di tabelle con trigger attivi</li>
+            <li><strong>Status:</strong> Attivo o Inattivo</li>
+            <li><strong>ID Detection:</strong> Stato del rilevamento campi ID per ogni tabella</li>
+        </ul>
+    </div>
+    
+    <div class="feature">
+        <h4>Informazioni Sistema Migliorate</h4>
+        <p>Visualizza dettagli completi del sistema:</p>
+        <ul>
+            <li><strong>Versione PostgreSQL:</strong> Informazioni versione database e compatibilità</li>
+            <li><strong>Stato Monitoraggio:</strong> Numero di schemi e tabelle monitorate</li>
+            <li><strong>Metriche Attività:</strong> Modifiche oggi, dimensione log, statistiche performance</li>
+            <li><strong>Stato Sicurezza:</strong> Verifica funzioni SECURITY DEFINER</li>
+            <li><strong>Statistiche Rilevamento ID:</strong> Tasso di successo rilevamento campi ID</li>
+            <li><strong>Ultimo Aggiornamento:</strong> Quando le informazioni sono state aggiornate l'ultima volta</li>
+        </ul>
+    </div>
+    
+    <h2>Configurazione Database</h2>
+    
+    <h3>Connessione Database Sicura</h3>
+    <div class="feature">
+        <h4>Parametri di Connessione</h4>
+        <ul>
+            <li><strong>Host:</strong> Indirizzo server database (es. localhost, IP)</li>
+            <li><strong>Port:</strong> Porta PostgreSQL (default 5432)</li>
+            <li><strong>Database:</strong> Nome del database</li>
+            <li><strong>Username:</strong> Nome utente database</li>
+            <li><strong>Password:</strong> Password database (salvata sicuramente in QSettings)</li>
+        </ul>
+    </div>
+    
+    <div class="warning">
+        <h4>Sicurezza Credenziali</h4>
+        <p>Le impostazioni di connessione sono salvate localmente in QSettings di QGIS. Usa 'Clear Saved' per rimuovere credenziali memorizzate se necessario.</p>
+    </div>
+    
+    <div class="step">
+        <h4>Test Connessione</h4>
+        <ol>
+            <li>Inserisci tutti i parametri richiesti</li>
+            <li>Clicca "Test Connection" per verificare</li>
+            <li>Controlla il messaggio di stato per conferma</li>
+            <li>Usa "Save & Connect" solo dopo test riuscito</li>
+        </ol>
+    </div>
+    
+    <h2>Esempi di Configurazione Avanzata</h2>
+    
+    <div class="success">
+        <h3>Esempio 1: Setup Iniziale con Sicurezza</h3>
+        <p><strong>Scenario:</strong> Impostazione audit system su nuovo database con sicurezza appropriata</p>
+        
+        <h4>Passi:</h4>
+        <ol>
+            <li><strong>Tab Installazione Sistema</strong>
+                <ul>
+                    <li>Stato mostra "Audit system not installed"</li>
+                    <li>Clicca "Install Audit System"</li>
+                    <li>Monitora log per installazione funzioni SECURITY DEFINER</li>
+                    <li>Aspetta "Audit system installed successfully!"</li>
+                    <li>Verifica che stato sicurezza mostri funzioni SECURITY DEFINER attive</li>
+                </ul>
+            </li>
+            <li><strong>Tab Configurazione Monitoraggio</strong>
+                <ul>
+                    <li>Schemi disponibili mostra: total, office_data, old_city</li>
+                    <li>Seleziona "total" e clicca "Add Schema →"</li>
+                    <li>Seleziona "office_data" e clicca "Add Schema →"</li>
+                    <li>Clicca "Preview Changes" per verificare sicurezza e trigger</li>
+                    <li>Clicca "Apply Configuration"</li>
+                </ul>
+            </li>
+            <li><strong>Tab Stato e Verifica</strong>
+                <ul>
+                    <li>Refresh stato mostra:</li>
+                    <li>total: 15 tabelle, Attivo, rilevamento ID: 98% successo</li>
+                    <li>office_data: 8 tabelle, Attivo, rilevamento ID: 100% successo</li>
+                    <li>Stato sicurezza: Tutte funzioni SECURITY DEFINER attive</li>
+                </ul>
+            </li>
+        </ol>
+    </div>
+    
+    <div class="info">
+        <h3>Esempio 2: Setup Gestione Permessi</h3>
+        <p><strong>Scenario:</strong> Impostazione controllo accesso basato su ruoli per operazioni rollback</p>
+        
+        <pre><code>-- Creare ruolo admin audit in PostgreSQL:
+CREATE ROLE audit_admin;
+
+-- Concedere permessi rollback:
+GRANT EXECUTE ON FUNCTION logging.rollback_record_to_version(text, text, integer, text) TO audit_admin;
+GRANT EXECUTE ON FUNCTION logging.undo_user_changes(text, integer, text, boolean) TO audit_admin;
+
+-- Assegnare ruolo a utenti specifici:
+GRANT audit_admin TO your_admin_user;
+
+-- Test permessi:
+-- Utenti regolari possono vedere log audit
+-- Solo ruolo audit_admin può eseguire rollback
+-- Tutti gli utenti possono impostare motivi modifica e indirizzi IP</code></pre>
+    </div>
+    
+    <h2>Architettura Sicurezza</h2>
+    
+    <div class="highlight">
+        <h3>Vantaggi SECURITY DEFINER</h3>
+        <ul>
+            <li><strong>Separazione Privilegi:</strong> Utenti audit senza accesso diretto tabelle</li>
+            <li><strong>Sicurezza Centralizzata:</strong> Tutti i permessi gestiti tramite ownership funzioni</li>
+            <li><strong>Protezione Injection:</strong> Prevenzione SQL injection integrata</li>
+            <li><strong>Integrità Audit:</strong> Utenti non possono manipolare direttamente dati audit</li>
+        </ul>
+    </div>
+    
+    <div class="feature">
+        <h3>Mitigazione Rischi</h3>
+        <ul>
+            <li><strong>Validazione Input:</strong> Tutte le funzioni validano parametri input</li>
+            <li><strong>Restrizioni Ruolo:</strong> Funzioni sensibili limitate a ruoli admin</li>
+            <li><strong>Logging Audit:</strong> Tutte le esecuzioni funzioni sono loggate</li>
+            <li><strong>Verifica Owner:</strong> Funzioni possedute dal superuser database</li>
+        </ul>
+    </div>
+    
+    <h2>Configurazione Avanzata</h2>
+    
+    <h3>Anteprima SQL Migliorata</h3>
+    <p>La funzione anteprima ora mostra SQL con sicurezza migliorata:</p>
+    
+    <pre><code>-- Applica monitoraggio a schema total con trigger SECURITY DEFINER
+DO $$
+DECLARE
+    t text;
+BEGIN
+    FOR t IN
+        SELECT table_name FROM information_schema.tables
+        WHERE table_schema='total' AND table_type = 'BASE TABLE'
+    LOOP
+        -- Rimuovi trigger esistente
+        EXECUTE format('DROP TRIGGER IF EXISTS "Notify_Update_Versioned" ON total.%I', t);
+        
+        -- Crea trigger SECURITY DEFINER
+        EXECUTE format('CREATE TRIGGER "Notify_Update_Versioned"
+                        AFTER INSERT OR DELETE OR UPDATE ON total.%I
+                        FOR EACH ROW EXECUTE FUNCTION logging.notify_with_versioning()', t);
+                        
+        -- Verifica installazione trigger
+        IF NOT EXISTS (
+            SELECT 1 FROM pg_trigger t 
+            JOIN pg_class c ON t.tgrelid = c.oid 
+            WHERE c.relname = t AND t.tgname = 'Notify_Update_Versioned'
+        ) THEN
+            RAISE EXCEPTION 'Failed to create trigger for table %', t;
+        END IF;
+    END LOOP;
+    
+    RAISE NOTICE 'COMPLETE: total schema monitoring enabled with SECURITY DEFINER';
+END;
+$$ LANGUAGE plpgsql;</code></pre>
+    
+    <h3>Configurazione Rilevamento ID</h3>
+    <div class="feature">
+        <p>Il sistema ora include rilevamento avanzato campi ID:</p>
+        <ul>
+            <li><strong>Scoperta Chiavi Primarie:</strong> Rilevamento automatico dallo schema tabella</li>
+            <li><strong>Riconoscimento Campi Comuni:</strong> Supporto per id, gid, fid, objectid, oid, pk, _id</li>
+            <li><strong>Pattern Matching:</strong> Qualsiasi campo che termina con 'id'</li>
+            <li><strong>Strategia Fallback:</strong> Algoritmo selezione campi prioritizzata</li>
+        </ul>
+    </div>
+    
+    <h2>Ottimizzazione Performance</h2>
+    
+    <div class="feature">
+        <h3>Indicizzazione Migliorata</h3>
+        <ul>
+            <li><strong>Indice Timestamp:</strong> Ottimizzato per query basate su tempo</li>
+            <li><strong>Indice Schema-Tabella:</strong> Filtro veloce per tabella</li>
+            <li><strong>Indice Utente:</strong> Lookup rapido attività utente</li>
+            <li><strong>Indice Versione:</strong> Query efficienti basate su versione</li>
+            <li><strong>Indice Versione Corrente:</strong> Indice parziale solo per record attivi</li>
+        </ul>
+    </div>
+    
+    <div class="feature">
+        <h3>Ottimizzazione Query</h3>
+        <ul>
+            <li><strong>Estrazione Campi JSON:</strong> Query ottimizzate rilevamento campi ID</li>
+            <li><strong>Uso CTE:</strong> Common table expressions per query complesse</li>
+            <li><strong>Hint Indici:</strong> Ottimizzazione query planner per query audit</li>
+        </ul>
+    </div>
+    
+    <h2>Troubleshooting Sistema Migliorato</h2>
+    
+    <div class="warning">
+        <h3>Problemi Sicurezza</h3>
+        <ul>
+            <li><strong>Permessi Funzioni:</strong> Verifica stato SECURITY DEFINER</li>
+            <li><strong>Assegnazioni Ruolo:</strong> Controlla membership ruolo audit_admin</li>
+            <li><strong>Ownership Funzioni:</strong> Assicura funzioni possedute dal database owner</li>
+        </ul>
+    </div>
+    
+    <div class="warning">
+        <h3>Problemi Rilevamento ID</h3>
+        <ul>
+            <li><strong>Chiave Primaria Mancante:</strong> Controlla schema tabella per definizione PK appropriata</li>
+            <li><strong>Campi Non Standard:</strong> Verifica supporto per nomi campi ID personalizzati</li>
+            <li><strong>Tasso Rilevamento:</strong> Monitora tasso successo rilevamento ID nel tab stato</li>
+        </ul>
+    </div>
+    
+    <h2>Best Practices Sistema Migliorato</h2>
+    
+    <div class="success">
+        <h3>Best Practices Sicurezza</h3>
+        <ul>
+            <li>Usa sempre funzioni SECURITY DEFINER per operazioni audit</li>
+            <li>Limita funzioni rollback solo a ruoli admin</li>
+            <li>Audit regolarmente permessi funzioni e ownership</li>
+            <li>Monitora log esecuzione funzioni per attività sospette</li>
+        </ul>
+    </div>
+    
+    <div class="success">
+        <h3>Best Practices Performance</h3>
+        <ul>
+            <li>Monitora tassi successo rilevamento ID</li>
+            <li>Analizza regolarmente performance query su tabelle audit</li>
+            <li>Considera partizionamento tabelle audit grandi per data</li>
+            <li>Archivia dati audit vecchi per mantenere performance</li>
+        </ul>
+    </div>
+    
+    <h2>Migrazione e Aggiornamento</h2>
+    
+    <div class="step">
+        <h3>Aggiornamento Sistemi Esistenti</h3>
+        <ol>
+            <li>Backup dati audit esistenti</li>
+            <li>Usa pulsante "Reinstall/Update System"</li>
+            <li>Verifica che funzioni SECURITY DEFINER siano installate</li>
+            <li>Testa rilevamento ID su tabelle esistenti</li>
+            <li>Aggiorna permessi ruolo se necessario</li>
+        </ol>
+    </div>
+    
+    <div class="info">
+        <h3>Preservazione Dati</h3>
+        <ul>
+            <li>Tutti i dati audit storici sono preservati durante aggiornamenti</li>
+            <li>Aggiornamenti funzioni mantengono compatibilità all'indietro</li>
+            <li>Ricreazioni trigger non influenzano dati esistenti</li>
+            <li>Numerazione versioni continua senza problemi</li>
+        </ul>
+    </div>
+    
+    <p><em>Una configurazione appropriata è fondamentale per il successo del sistema di audit. Dedica tempo alla configurazione iniziale per massimizzare sicurezza e performance.</em></p>
+</body>
+</html>

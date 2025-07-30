@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
+        h1 { color: #2c3e50; border-bottom: 2px solid #3498db; }
+        h2 { color: #34495e; margin-top: 30px; }
+        h3 { color: #7f8c8d; }
+        ul, ol { margin-left: 20px; }
+        li { margin-bottom: 8px; }
+        .feature { background: #ecf0f1; padding: 15px; margin: 15px 0; border-radius: 5px; }
+        .highlight { background: #fff3cd; padding: 10px; border-radius: 4px; }
+        .warning { background: #f8d7da; padding: 10px; border-radius: 4px; border-left: 4px solid #dc3545; }
+        .danger { background: #f8d7da; padding: 15px; border-radius: 4px; border: 2px solid #dc3545; }
+        .success { background: #d4edda; padding: 10px; border-radius: 4px; border-left: 4px solid #28a745; }
+        .info { background: #d1ecf1; padding: 10px; border-radius: 4px; border-left: 4px solid #17a2b8; }
+        code { background: #f8f9fa; padding: 2px 6px; border-radius: 3px; font-family: Consolas, monospace; }
+        .step { background: #e9ecef; padding: 10px; margin: 10px 0; border-left: 4px solid #6c757d; }
+        table { border-collapse: collapse; width: 100%; margin: 15px 0; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .procedure { background: #f8f9fa; padding: 15px; margin: 10px 0; border-radius: 5px; border-left: 4px solid #28a745; }
+    </style>
+</head>
+<body>
+    <h1>Sistema di Rollback Sicuro</h1>
+    
+    <div class="danger">
+        <h2>⚠️ ATTENZIONE - OPERAZIONI CRITICHE</h2>
+        <p><strong>Le operazioni di rollback modificano permanentemente i dati del database. Usa sempre la modalità "Test (Dry Run)" prima di eseguire rollback reali. Assicurati di avere backup adeguati prima di procedere.</strong></p>
+    </div>
+    
+    <h2>Panoramica del Sistema Rollback</h2>
+    <p>Il tab <strong>Rollback</strong> fornisce capacità sicure e controllate per annullare modifiche al database, con due modalità principali: rollback di record singoli e annullamento di modifiche utente su larga scala.</p>
+    
+    <h2>Architettura di Sicurezza</h2>
+    
+    <div class="feature">
+        <h3>Funzioni SECURITY DEFINER</h3>
+        <ul>
+            <li><strong>Isolamento privilegi:</strong> Le funzioni rollback operano con privilegi elevati ma controlli di sicurezza</li>
+            <li><strong>Accesso basato su ruoli:</strong> Funzioni limitate a utenti con ruolo <code>audit_admin</code></li>
+            <li><strong>Validazione input:</strong> Tutti i parametri sono validati prima dell'esecuzione</li>
+            <li><strong>Logging completo:</strong> Ogni operazione di rollback è registrata nella tabella <code>t_rollback_history</code></li>
+        </ul>
+    </div>
+    
+    <div class="highlight">
+        <h3>Meccanismi di Protezione</h3>
+        <ul>
+            <li><strong>Conferme multiple:</strong> Dialog di conferma per ogni operazione</li>
+            <li><strong>Motivi obbligatori:</strong> Ogni rollback deve essere motivato</li>
+            <li><strong>Dry run obbligatorio:</strong> Test consigliato prima dell'esecuzione</li>
+            <li><strong>Cronologia immutabile:</strong> Tutte le operazioni sono tracciate</li>
+        </ul>
+    </div>
+    
+    <h2>Tipi di Rollback</h2>
+    
+    <h3>1. Rollback Record Singolo</h3>
+    
+    <div class="procedure">
+        <h4>Uso Appropriato</h4>
+        <ul>
+            <li>Correzione di errori su record specifici</li>
+            <li>Ripristino di dati danneggiati accidentalmente</li>
+            <li>Annullamento di modifiche non autorizzate</li>
+            <li>Ripristino dopo test o operazioni di prova</li>
+        </ul>
+    </div>
+    
+    <h4>Interfaccia Rollback Singolo</h4>
+    <div class="feature">
+        <table>
+            <tr>
+                <th>Campo</th>
+                <th>Descrizione</th>
+                <th>Esempio</th>
+                <th>Obbligatorio</th>
+            </tr>
+            <tr>
+                <td><strong>Schema</strong></td>
+                <td>Schema del database</td>
+                <td>total, office_data</td>
+                <td>Sì</td>
+            </tr>
+            <tr>
+                <td><strong>Table</strong></td>
+                <td>Nome tabella</td>
+                <td>buildings, roads</td>
+                <td>Sì</td>
+            </tr>
+            <tr>
+                <td><strong>Version</strong></td>
+                <td>Numero versione target</td>
+                <td>3, 15, 42</td>
+                <td>Sì</td>
+            </tr>
+            <tr>
+                <td><strong>Reason</strong></td>
+                <td>Motivo dettagliato</td>
+                <td>"Correzione coordinate errate"</td>
+                <td>Sì</td>
+            </tr>
+        </table>
+    </div>
+    
+    <div class="step">
+        <h4>Procedura Rollback Singolo</h4>
+        <ol>
+            <li><strong>Identifica target:</strong> Usa tab Versioning per trovare la versione corretta</li>
+            <li><strong>Compila form:</strong> Inserisci schema, tabella, versione, motivo</li>
+            <li><strong>Conferma operazione:</strong> Clicca "Execute Record Rollback"</li>
+            <li><strong>Dialog conferma:</strong> Rivedi dettagli e conferma con "Yes"</li>
+            <li><strong>Monitoraggio:</strong> Controlla risultato e refresh automatico dati</li>
+        </ol>
+    </div>
+    
+    <h3>2. Annullamento Modifiche Utente</h3>
+    
+    <div class="procedure">
+        <h4>Uso Appropriato</h4>
+        <ul>
+            <li>Annullamento modifiche massive errate</li>
+            <li>Ripristino dopo operazioni utente non autorizzate</li>
+            <li>Correzione di errori sistematici di un utente</li>
+            <li>Rollback durante finestre di manutenzione</li>
+        </ul>
+    </div>
+    
+    <h4>Interfaccia Modifiche Utente</h4>
+    <div class="feature">
+        <table>
+            <tr>
+                <th>Campo</th>
+                <th>Descrizione</th>
+                <th>Range/Valori</th>
+                <th>Default</th>
+            </tr>
+            <tr>
+                <td><strong>User</strong></td>
+                <td>Nome utente target</td>
+                <td>Dropdown + editabile</td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td><strong>Minutes ago</strong></td>
+                <td>Finestra temporale</td>
+                <td>1 - 10080 (7 giorni)</td>
+                <td>60</td>
+            </tr>
+            <tr>
+                <td><strong>Reason</strong></td>
+                <td>Motivo dettagliato</td>
+                <td>Testo libero</td>
+                <td>-</td>
+            </tr>
+        </table>
+    </div>
+    
+    <div class="warning">
+        <h4>⚠️ Modalità Dry Run Obbligatoria</h4>
+        <p>SEMPRE eseguire "Test (Dry Run)" prima del rollback utente reale. Questo mostra esattamente quali modifiche saranno annullate senza eseguirle effettivamente.</p>
+    </div>
+    
+    <div class="step">
+        <h4>Procedura Modifiche Utente</h4>
+        <ol>
+            <li><strong>Identifica utente:</strong> Seleziona o inserisci nome utente</li>
+            <li><strong>Imposta finestra:</strong> Definisci intervallo temporale in minuti</li>
+            <li><strong>Motivo dettagliato:</strong> Spiega perché è necessario il rollback</li>
+            <li><strong>DRY RUN OBBLIGATORIO:</strong> Clicca "Test (Dry Run)" prima</li>
+            <li><strong>Analizza risultati:</strong> Esamina l'output nella sezione Results</li>
+            <li><strong>Esegui se corretto:</strong> Solo dopo conferma dry run, clicca "Execute User Rollback"</li>
+            <li><strong>Conferma finale:</strong> Dialog di conferma con dettagli operazione</li>
+        </ol>
+    </div>
+    
+    <h2>Cronologia Rollback</h2>
+    
+    <h3>Tabella Cronologia</h3>
+    <div class="feature">
+        <p>La sezione inferiore mostra cronologia completa di tutti i rollback eseguiti:</p>
+        <table>
+            <tr>
+                <th>Colonna</th>
+                <th>Descrizione</th>
+                <th>Valori</th>
+            </tr>
+            <tr>
+                <td><strong>Date/Time</strong></td>
+                <td>Timestamp operazione</td>
+                <td>DD/MM/YYYY HH:MM:SS</td>
+            </tr>
+            <tr>
+                <td><strong>User</strong></td>
+                <td>Chi ha eseguito il rollback</td>
+                <td>Nome utente database</td>
+            </tr>
+            <tr>
+                <td><strong>Table</strong></td>
+                <td>Tabella target</td>
+                <td>schema.tabella</td>
+            </tr>
+            <tr>
+                <td><strong>Reason</strong></td>
+                <td>Motivo fornito</td>
+                <td>Testo completo</td>
+            </tr>
+            <tr>
+                <td><strong>Records Affected</strong></td>
+                <td>Numero record modificati</td>
+                <td>Numero intero</td>
+            </tr>
+            <tr>
+                <td><strong>Success</strong></td>
+                <td>Esito operazione</td>
+                <td>Yes/No</td>
+            </tr>
+        </table>
+    </div>
+    
+    <h2>Funzioni PostgreSQL Sottostanti</h2>
+    
+    <h3>rollback_record_to_version()</h3>
+    <div class="feature">
+        <h4>Firma Funzione</h4>
+        <code>logging.rollback_record_to_version(schema text, table text, version integer, reason text)</code>
+        
+        <h4>Funzionalità</h4>
+        <ul>
+            <li>Ripristina un record specifico a una versione precedente</li>
+            <li>Costruisce dinamicamente query UPDATE con dati della versione target</li>
+            <li>Gestisce tipi dati JSON, NULL e stringhe correttamente</li>
+            <li>Registra operazione in <code>t_rollback_history</code></li>
+            <li>Gestione errori completa con rollback automatico</li>
+        </ul>
+    </div>
+    
+    <h3>undo_user_changes()</h3>
+    <div class="feature">
+        <h4>Firma Funzione</h4>
+        <code>logging.undo_user_changes(user text, minutes_ago integer, reason text, dry_run boolean)</code>
+        
+        <h4>Funzionalità</h4>
+        <ul>
+            <li>Annulla tutte le modifiche di un utente in una finestra temporale</li>
+            <li>Supporta modalità dry run per anteprima sicura</li>
+            <li>Ripristina UPDATE ai valori precedenti</li>
+            <li>Ripristina record DELETE reinserendoli</li>
+            <li>Ignora operazioni INSERT (non annullabili)</li>
+            <li>Report dettagliato delle operazioni eseguite</li>
+        </ul>
+    </div>
+    
+    <h2>Esempi Pratici</h2>
+    
+    <h3>Esempio 1: Correzione Coordinate Edificio</h3>
+    <div class="success">
+        <h4>Scenario</h4>
+        <p>Un edificio ha coordinate X,Y errate inserite per errore.</p>
+        
+        <h4>Procedura</h4>
+        <ol>
+            <li><strong>Identificazione:</strong>
+                <ul>
+                    <li>Tab Monitoraggio: trova la modifica errata</li>
+                    <li>Tab Versioning: cerca versioni dell'edificio ID 12345</li>
+                    <li>Confronta versione 4 (corrotta) con versione 3 (corretta)</li>
+                </ul>
+            </li>
+            <li><strong>Rollback:</strong>
+                <ul>
+                    <li>Schema: total</li>
+                    <li>Table: buildings</li>
+                    <li>Version: 3</li>
+                    <li>Reason: "Correzione coordinate X,Y inserite erroneamente in versione 4"</li>
+                </ul>
+            </li>
+            <li><strong>Risultato:</strong> Edificio ripristinato a coordinate corrette</li>
+        </ol>
+    </div>
+    
+    <h3>Esempio 2: Annullamento Modifiche Utente Massive</h3>
+    <div class="info">
+        <h4>Scenario</h4>
+        <p>Un utente ha eseguito modifiche errate su molte tabelle negli ultimi 30 minuti.</p>
+        
+        <h4>Procedura</h4>
+        <ol>
+            <li><strong>Dry Run:</strong>
+                <ul>
+                    <li>User: utente_problematico</li>
+                    <li>Minutes ago: 30</li>
+                    <li>Reason: "Annullamento modifiche errate upload dati"</li>
+                    <li>Clicca "Test (Dry Run)"</li>
+                </ul>
+            </li>
+            <li><strong>Analisi Risultati:</strong>
+                <pre>DRY RUN - Changes by utente_problematico that would be undone:
+- UPDATE: total.buildings at 2025-07-24 14:30:15
+- UPDATE: total.roads at 2025-07-24 14:32:08
+- DELETE: office_data.parcels at 2025-07-24 14:35:22
+
+Total changes to undo: 3</pre>
+            </li>
+            <li><strong>Esecuzione:</strong> Se risultati OK, clicca "Execute User Rollback"</li>
+            <li><strong>Verifica:</strong> Controlla cronologia rollback per conferma successo</li>
+        </ol>
+    </div>
+    
+    <h2>Gestione Errori e Troubleshooting</h2>
+    
+    <h3>Errori Comuni Rollback Singolo</h3>
+    <div class="warning">
+        <h4>Versione Non Trovata</h4>
+        <ul>
+            <li><strong>Causa:</strong> Numero versione inesistente</li>
+            <li><strong>Soluzione:</strong> Verifica versioni disponibili nel tab Versioning</li>
+            <li><strong>Prevenzione:</strong> Usa sempre tab Versioning per identificare versioni valide</li>
+        </ul>
+    </div>
+    
+    <div class="warning">
+        <h4>Record Non Esiste</h4>
+        <ul>
+            <li><strong>Causa:</strong> Record è stato eliminato o ID non corretto</li>
+            <li><strong>Soluzione:</strong> Verifica esistenza record nella tabella target</li>
+            <li><strong>Nota:</strong> Il rollback può ripristinare anche record eliminati</li>
+        </ul>
+    </div>
+    
+    <h3>Errori Comuni Modifiche Utente</h3>
+    <div class="warning">
+        <h4>Nessuna Modifica Trovata</h4>
+        <ul>
+            <li><strong>Causa:</strong> Utente o finestra temporale errati</li>
+            <li><strong>Soluzione:</strong> Verifica nome utente esatto e estendi finestra temporale</li>
+            <li><strong>Debug:</strong> Controlla tab Monitoraggio per confermare attività utente</li>
+        </ul>
+    </div>
+    
+    <h3>Gestione Fallimenti</h3>
+    <div class="danger">
+        <h4>Rollback Fallito</h4>
+        <p>Se un rollback fallisce:</p>
+        <ol>
+            <li><strong>Controllo automatico:</strong> Sistema registra fallimento in cronologia</li>
+            <li><strong>Rollback transazione:</strong> Database rimane nello stato precedente</li>
+            <li><strong>Messaggio errore:</strong> Dettagli specifici del problema</li>
+            <li><strong>Investigazione:</strong> Controlla log database per dettagli tecnici</li>
+        </ol>
+    </div>
+    
+    <h2>Best Practices di Sicurezza</h2>
+    
+    <h3>Prima di Ogni Rollback</h3>
+    <div class="procedure">
+        <h4>Checklist Pre-Rollback</h4>
+        <ol>
+            <li>✓ <strong>Backup database:</strong> Sempre disponibile</li>
+            <li>✓ <strong>Verifica autorizzazioni:</strong> Hai i privilegi necessari?</li>
+            <li>✓ <strong>Analisi impatto:</strong> Chi/cosa sarà influenzato?</li>
+            <li>✓ <strong>Finestra manutenzione:</strong> È il momento appropriato?</li>
+            <li>✓ <strong>Comunicazione:</strong> Stakeholder informati?</li>
+            <li>✓ <strong>Dry run eseguito:</strong> Per modifiche utente multiple</li>
+            <li>✓ <strong>Motivo documentato:</strong> Chiaro e completo</li>
+        </ol>
+    </div>
+    
+    <h3>Dopo Ogni Rollback</h3>
+    <div class="procedure">
+        <h4>Checklist Post-Rollback</h4>
+        <ol>
+            <li>✓ <strong>Verifica successo:</strong> Controlla cronologia rollback</li>
+            <li>✓ <strong>Test funzionalità:</strong> I dati sono corretti?</li>
+            <li>✓ <strong>Notifica stakeholder:</strong> Operazione completata</li>
+            <li>✓ <strong>Documentazione:</strong> Aggiorna log operativi</li>
+            <li>✓ <strong>Monitoraggio:</strong> Osserva per effetti collaterali</li>
+            <li>✓ <strong>Lezioni apprese:</strong> Come prevenire in futuro?</li>
+        </ol>
+    </div>
+    
+    <h2>Limitazioni e Considerazioni</h2>
+    
+    <h3>Limitazioni Tecniche</h3>
+    <div class="warning">
+        <ul>
+            <li><strong>INSERT non annullabili:</strong> Le operazioni INSERT non possono essere "annullate" tramite undo_user_changes</li>
+            <li><strong>Dipendenze foreign key:</strong> Possono impedire rollback se violano vincoli</li>
+            <li><strong>Trigger personalizzati:</strong> Altri trigger potrebbero interferire</li>
+            <li><strong>Permessi insufficienti:</strong> Richiede ruolo audit_admin per esecuzione</li>
+        </ul>
+    </div>
+    
+    <h3>Considerazioni di Business</h3>
+    <div class="highlight">
+        <ul>
+            <li><strong>Impatto utenti:</strong> Il rollback può influenzare lavoro in corso</li>
+            <li><strong>Integrità referenziale:</strong> Verificare che i dati ripristinati siano consistenti</li>
+            <li><strong>Compliance:</strong> Documentare appropriatamente per audit esterni</li>
+            <li><strong>Comunicazione:</strong> Informare team tecnico e business prima di rollback significativi</li>
+        </ul>
+    </div>
+    
+    <h2>Monitoraggio e Audit</h2>
+    
+    <h3>Metriche di Monitoraggio</h3>
+    <div class="feature">
+        <ul>
+            <li><strong>Frequenza rollback:</strong> Troppi rollback indicano problemi sistematici</li>
+            <li><strong>Utenti coinvolti:</strong> Alcuni utenti richiedono più training?</li>
+            <li><strong>Orari operazioni:</strong> Rollback fuori orario richiedono approvazione?</li>
+            <li><strong>Dimensione impatto:</strong> Numero record coinvolti per operazione</li>
+            <li><strong>Tasso successo:</strong> Percentuale rollback completati con successo</li>
+        </ul>
+    </div>
+    
+    <h3>Report per Management</h3>
+    <div class="info">
+        <p>La cronologia rollback fornisce dati per report mensili:</p>
+        <ul>
+            <li>Numero totale operazioni rollback</li>
+            <li>Utenti più coinvolti (sia come target che come esecutori)</li>
+            <li>Motivi più comuni per rollback</li>
+            <li>Trend temporali e picchi di attività</li>
+            <li>Efficacia delle misure preventive</li>
+        </ul>
+    </div>
+    
+    <p><em>Le operazioni di rollback sono strumenti potenti ma devono essere utilizzate con cautela e piena comprensione delle conseguenze. Segui sempre le procedure di sicurezza e documenta appropriatamente ogni operazione.</em></p>
+</body>
+</html>

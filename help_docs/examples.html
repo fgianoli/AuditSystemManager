@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
+        h1 { color: #2c3e50; border-bottom: 2px solid #3498db; }
+        h2 { color: #34495e; margin-top: 30px; }
+        h3 { color: #7f8c8d; }
+        ul, ol { margin-left: 20px; }
+        li { margin-bottom: 8px; }
+        .feature { background: #ecf0f1; padding: 15px; margin: 15px 0; border-radius: 5px; }
+        .highlight { background: #fff3cd; padding: 10px; border-radius: 4px; }
+        .warning { background: #f8d7da; padding: 10px; border-radius: 4px; border-left: 4px solid #dc3545; }
+        .success { background: #d4edda; padding: 10px; border-radius: 4px; border-left: 4px solid #28a745; }
+        .info { background: #d1ecf1; padding: 10px; border-radius: 4px; border-left: 4px solid #17a2b8; }
+        code { background: #f8f9fa; padding: 2px 6px; border-radius: 3px; font-family: Consolas, monospace; }
+        pre { background: #f8f9fa; padding: 15px; border-radius: 5px; overflow-x: auto; font-family: Consolas, monospace; }
+        .scenario { background: #f8f9fa; padding: 15px; margin: 10px 0; border-radius: 5px; border-left: 4px solid #6c757d; }
+        .step-by-step { background: #e3f2fd; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        table { border-collapse: collapse; width: 100%; margin: 15px 0; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .timeline { border-left: 3px solid #3498db; margin-left: 20px; padding-left: 20px; }
+        .timeline-item { margin-bottom: 20px; }
+        .timeline-time { font-weight: bold; color: #3498db; }
+    </style>
+</head>
+<body>
+    <h1>Esempi Pratici e Casi d'Uso</h1>
+    
+    <h2>Panoramica degli Esempi</h2>
+    <p>Questa sezione fornisce esempi pratici e dettagliati per utilizzare efficacemente l'Audit System Manager in scenari reali. Ogni esempio include setup, procedura step-by-step e best practices.</p>
+    
+    <h2>Esempio 1: Setup Iniziale Completo</h2>
+    
+    <div class="scenario">
+        <h3>Scenario</h3>
+        <p><strong>Situazione:</strong> Nuovo ambiente di lavoro con database PostgreSQL contenente schemi geografici. Necessità di implementare sistema di audit completo per tracciare tutte le modifiche.</p>
+        
+        <p><strong>Obiettivo:</strong> Configurare monitoraggio completo su schemi critici con sicurezza appropriata.</p>
+        
+        <p><strong>Schemi target:</strong> total, office_data, old_city</p>
+    </div>
+    
+    <div class="step-by-step">
+        <h4>Procedura Step-by-Step</h4>
+        
+        <h5>Fase 1: Configurazione Connessione Database</h5>
+        <ol>
+            <li><strong>Apri QGIS</strong> e avvia il plugin Audit System Manager</li>
+            <li><strong>Primo avvio:</strong> Apparirà dialog "Database Configuration"</li>
+            <li><strong>Inserisci parametri:</strong>
+                <ul>
+                    <li>Host: localhost (o IP server)</li>
+                    <li>Port: 5432</li>
+                    <li>Database: gis_production</li>
+                    <li>Username: gis_admin</li>
+                    <li>Password: [password sicura]</li>
+                </ul>
+            </li>
+            <li><strong>Test connessione:</strong> Clicca "Test Connection"</li>
+            <li><strong>Salva impostazioni:</strong> Clicca "Save & Connect"</li>
+        </ol>
+        
+        <h5>Fase 2: Installazione Sistema Audit</h5>
+        <ol>
+            <li><strong>Accedi setup:</strong> Tab Configurazione → "Setup Audit System"</li>
+            <li><strong>Tab System Installation:</strong>
+                <ul>
+                    <li>Stato mostra: "Audit system not installed"</li>
+                    <li>Clicca "Install Audit System"</li>
+                    <li>Monitora log installazione</li>
+                    <li>Attendi conferma: "Audit system installed successfully!"</li>
+                </ul>
+            </li>
+            <li><strong>Verifica:</strong> Stato cambia a "Audit system is installed and ready" (verde)</li>
+        </ol>
+        
+        <h5>Fase 3: Configurazione Monitoraggio</h5>
+        <ol>
+            <li><strong>Tab Configure Monitoring:</strong></li>
+            <li><strong>Schemi disponibili:</strong> Vedi total, office_data, old_city, sectorial nella lista sinistra</li>
+            <li><strong>Aggiungi schemi:</strong>
+                <ul>
+                    <li>Seleziona "total" → "Add Schema →"</li>
+                    <li>Seleziona "office_data" → "Add Schema →"</li>
+                    <li>Seleziona "old_city" → "Add Schema →"</li>
+                </ul>
+            </li>
+            <li><strong>Verifica lista monitorati:</strong> I tre schemi appaiono nella lista destra</li>
+            <li><strong>Anteprima:</strong> Clicca "Preview Changes" per vedere SQL generato</li>
+            <li><strong>Applica:</strong> Clicca "Apply Configuration"</li>
+            <li><strong>Monitora risultati:</strong> Log mostra "Configuration applied successfully!"</li>
+        </ol>
+        
+        <h5>Fase 4: Verifica Setup</h5>
+        <ol>
+            <li><strong>Tab Status & Verification:</strong></li>
+            <li><strong>Refresh status:</strong> Clicca "Refresh Status"</li>
+            <li><strong>Controlla tabella:</strong>
+                <ul>
+                    <li>total: 15 tables, Active</li>
+                    <li>office_data: 8 tables, Active</li>
+                    <li>old_city: 12 tables, Active</li>
+                </ul>
+            </li>
+            <li><strong>Sistema pronto!</strong> Inizia monitoraggio in tempo reale</li>
+        </ol>
+    </div>
+    
+    <div class="success">
+        <h4>Risultato Atteso</h4>
+        <ul>
+            <li>✓ Sistema audit installato e funzionante</li>
+            <li>✓ 35 tabelle monitorate attivamente</li>
+            <li>✓ Trigger di audit su tutti gli schemi target</li>
+            <li>✓ Funzioni SECURITY DEFINER operative</li>
+            <li>✓ Pronto per tracciare modifiche in tempo reale</li>
+        </ul>
+    </div>
+    
+    <h2>Esempio 2: Investigazione Modifica Sospetta</h2>
+    
+    <div class="scenario">
+        <h3>Scenario</h3>
+        <p><strong>Situazione:</strong> Durante controllo mattutino, si nota che alcuni edifici hanno coordinate errate. Necessario investigare quando e da chi sono state modificate.</p>
+        
+        <p><strong>Obiettivo:</strong> Identificare modifiche sospette, analizzare cronologia e preparare eventuale rollback.</p>
+        
+        <p><strong>Dati:</strong> Schema "total", tabella "buildings", possibili problemi con edifici ID 12345 e 67890</p>
+    </div>
+    
+    <div class="timeline">
+        <h4>Timeline Investigazione</h4>
+        
+        <div class="timeline-item">
+            <div class="timeline-time">09:00 - Identificazione Problema</div>
+            <ol>
+                <li><strong>Apri tab Monitoraggio</strong></li>
+                <li><strong>Imposta filtri:</strong>
+                    <ul>
+                        <li>Schema: total</li>
+                        <li>Period: Today</li>
+                        <li>User: All users</li>
+                    </ul>
+                </li>
+                <li><strong>Cerca anomalie:</strong> Ordina per Record ID e cerca "12345"</li>
+                <li><strong>Identifica modifiche:</strong> Trova UPDATE su total.buildings alle 02:30</li>
+            </ol>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-time">09:15 - Analisi Dettagliata</div>
+            <ol>
+                <li><strong>Clicca destro sulla riga sospetta</strong></li>
+                <li><strong>Seleziona "Show Record Details"</strong></li>
+                <li><strong>Esamina JSON:</strong>
+                    <pre>OLD VALUES:
+{
+  "id": "12345",
+  "x_coord": "1234567.89",
+  "y_coord": "5432109.87",
+  "height": "15.5"
+}
+
+NEW VALUES:
+{
+  "id": "12345", 
+  "x_coord": "9999999.99",
+  "y_coord": "8888888.88",
+  "height": "15.5"
+}</pre>
+                </li>
+                <li><strong>Problema identificato:</strong> Coordinate X,Y cambiate drasticamente alle 02:30 da "batch_user"</li>
+            </ol>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-time">09:30 - Analisi Versioni</div>
+            <ol>
+                <li><strong>Menu contestuale:</strong> "Auto-fill Versioning Search"</li>
+                <li><strong>Tab Versioning si apre:</strong> Campi pre-compilati</li>
+                <li><strong>Clicca "Search Versions"</strong></li>
+                <li><strong>Risultati cronologia:</strong>
+                    <table>
+                        <tr><th>Version</th><th>Date/Time</th><th>User</th><th>Action</th><th>Current</th></tr>
+                        <tr><td>3</td><td>24/07/2025 02:30:15</td><td>batch_user</td><td>UPDATE</td><td>Yes</td></tr>
+                        <tr><td>2</td><td>20/07/2025 14:22:10</td><td>gis_operator</td><td>UPDATE</td><td>No</td></tr>
+                        <tr><td>1</td><td>15/07/2025 09:15:33</td><td>data_import</td><td>INSERT</td><td>No</td></tr>
+                    </table>
+                </li>
+                <li><strong>Confronto versioni:</strong> Seleziona Version 2 vs Version 3</li>
+                <li><strong>Clicca "Compare"</strong></li>
+                <li><strong>Conferma:</strong> Solo coordinate X,Y modificate erroneamente</li>
+            </ol>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-time">09:45 - Preparazione Rollback</div>
+            <ol>
+                <li><strong>Decisione:</strong> Ripristinare alla versione 2 (ultima buona)</li>
+                <li><strong>Tab Rollback:</strong> Single Record</li>
+                <li><strong>Compila form:</strong>
+                    <ul>
+                        <li>Schema: total</li>
+                        <li>Table: buildings</li>
+                        <li>Version: 2</li>
+                        <li>Reason: "Correzione coordinate errate inserite da batch_user alle 02:30. Ripristino versione precedente con coordinate corrette."</li>
+                    </ul>
+                </li>
+                <li><strong>Esegui rollback:</strong> "Execute Record Rollback" → Conferma</li>
+                <li><strong>Successo:</strong> Record ripristinato correttamente</li>
+            </ol>
+        </div>
+    </div>
+    
+    <div class="info">
+        <h4>Lezioni Apprese</h4>
+        <ul>
+            <li><strong>Monitoraggio proattivo:</strong> Controllo quotidiano modifiche notturne</li>
+            <li><strong>Validazione batch:</strong> Implementare controlli per operazioni automatiche</li>
+            <li><strong>Documentazione:</strong> Motivi dettagliati per ogni rollback</li>
+            <li><strong>Training:</strong> Educare utenti batch su procedure corrette</li>
+        </ul>
+    </div>
+    
+    <h2>Esempio 3: Rollback Modifiche Utente Massive</h2>
+    
+    <div class="scenario">
+        <h3>Scenario</h3>
+        <p><strong>Situazione:</strong> Un nuovo utente ha caricato dati errati durante una sessione di training, modificando accidentalmente record di produzione invece di quelli di test.</p>
+        
+        <p><strong>Problema:</strong> 47 modifiche in 25 minuti su tabelle critiche</p>
+        
+        <p><strong>Obiettivo:</strong> Annullare tutte le modifiche dell'utente senza impattare altri lavori</p>
+    </div>
+    
+    <div class="step-by-step">
+        <h4>Procedura di Emergenza</h4>
+        
+        <h5>Passo 1: Valutazione Impatto</h5>
+        <ol>
+            <li><strong>Tab Monitoraggio:</strong>
+                <ul>
+                    <li>Filtro User: "trainee_user"</li>
+                    <li>Period: Last 6 hours</li>
+                    <li>Conta modifiche: 47 record</li>
+                </ul>
+            </li>
+            <li><strong>Analisi tabelle impattate:</strong>
+                <ul>
+                    <li>total.buildings: 23 UPDATE</li>
+                    <li>office_data.parcels: 15 UPDATE</li>
+                    <li>old_city.monuments: 9 UPDATE</li>
+                </ul>
+            </li>
+            <li><strong>Verifica nessun altro utente:</strong> Conferma che solo "trainee_user" ha modificato questi record</li>
+        </ol>
+        
+        <h5>Passo 2: Test Rollback (DRY RUN)</h5>
+        <ol>
+            <li><strong>Tab Rollback → User Changes</strong></li>
+            <li><strong>Compila form:</strong>
+                <ul>
+                    <li>User: trainee_user</li>
+                    <li>Minutes ago: 30</li>
+                    <li>Reason: "Annullamento modifiche accidentali su dati produzione durante training"</li>
+                </ul>
+            </li>
+            <li><strong>DRY RUN OBBLIGATORIO:</strong> Clicca "Test (Dry Run)"</li>
+            <li><strong>Analizza output:</strong>
+                <pre>DRY RUN - Changes by trainee_user that would be undone:
+- UPDATE: total.buildings at 2025-07-24 10:45:23
+- UPDATE: total.buildings at 2025-07-24 10:46:15
+- UPDATE: total.buildings at 2025-07-24 10:47:08
+...
+- UPDATE: office_data.parcels at 2025-07-24 11:02:45
+- UPDATE: old_city.monuments at 2025-07-24 11:08:17
+
+Total changes to undo: 47</pre>
+            </li>
+            <li><strong>Conferma:</strong> Numero modifiche corretto, nessuna operazione critica (DELETE/INSERT)</li>
+        </ol>
+        
+        <h5>Passo 3: Esecuzione Rollback</h5>
+        <ol>
+            <li><strong>Comunicazione:</strong> Avvisa team che rollback è in corso</li>
+            <li><strong>Esegui rollback:</strong> "Execute User Rollback"</li>
+            <li><strong>Dialog conferma:</strong> Rivedi dettagli e conferma</li>
+            <li><strong>Monitoraggio:</strong> Osserva "Results" per conferma successo:
+                <pre>Undo completed. Changes restored: 47</pre>
+            </li>
+            <li><strong>Verifica cronologia:</strong> Controlla tabella Rollback History</li>
+        </ol>
+        
+        <h5>Passo 4: Verifica e Follow-up</h5>
+        <ol>
+            <li><strong>Test campionario:</strong> Verifica manualmente alcuni record ripristinati</li>
+            <li><strong>Comunicazione team:</strong> Conferma che operazione è completata</li>
+            <li><strong>Training utente:</strong> Sessione su procedure corrette</li>
+            <li><strong>Procedura migliorata:</strong> Implementa ambiente test separato</li>
+        </ol>
+    </div>
+    
+    <div class="success">
+        <h4>Risultato</h4>
+        <ul>
+            <li>✓ 47 modifiche annullate con successo</li>
+            <li>✓ Zero tempo di downtime per altri utenti</li>
+            <li>✓ Dati di produzione ripristinati allo stato corretto</li>
+            <li>✓ Lezione appresa documentata per prevenzione futura</li>
+        </ul>
+    </div>
+    
+    <h2>Esempio 4: Monitoraggio Compliance Mensile</h2>
+    
+    <div class="scenario">
+        <h3>Scenario</h3>
+        <p><strong>Situazione:</strong> Fine mese, necessità di generare report di compliance per audit esterno sui cambiamenti ai dati catastali.</p>
+        
+        <p><strong>Requisiti:</strong> Report dettagliato di tutte le modifiche del mese con export CSV per controllo esterno</p>
+    </div>
+    
+    <div class="step-by-step">
+        <h4>Procedura Report Mensile</h4>
+        
+        <h5>Raccolta Dati Generali</h5>
+        <ol>
+            <li><strong>Tab Monitoring:</strong>
+                <ul>
+                    <li>Schema: All schemas</li>
+                    <li>Period: Last week (ripeti per 4 settimane)</li>
+                    <li>User: All users</li>
+                </ul>
+            </li>
+            <li><strong>Export settimanali:</strong> Clicca "Export CSV" per ogni settimana</li>
+            <li><strong>Consolida dati:</strong> Unisci i 4 file CSV in Excel</li>
+        </ol>
+        
+        <h5>Analisi Statistiche</h5>
+        <ol>
+            <li><strong>Tab Statistics:</strong></li>
+            <li><strong>Metriche chiave:</strong>
+                <ul>
+                    <li>Modifiche totali del mese: 1,247</li>
+                    <li>Utenti attivi: 12</li>
+                    <li>Tabelle modificate: 23</li>
+                </ul>
+            </li>
+            <li><strong>Top Users:</strong>
+                <table>
+                    <tr><th>Utente</th><th>Totale</th><th>INSERT</th><th>UPDATE</th><th>DELETE</th></tr>
+                    <tr><td>gis_operator_1</td><td>456</td><td>120</td><td>330</td><td>6</td></tr>
+                    <tr><td>cadastral_tech</td><td>389</td><td>45</td><td>340</td><td>4</td></tr>
+                    <tr><td>survey_specialist</td><td>234</td><td>180</td><td>54</td><td>0</td></tr>
+                </table>
+            </li>
+            <li><strong>Top Tables:</strong>
+                <table>
+                    <tr><th>Tabella</th><th>Modifiche</th><th>Utenti</th><th>Ultima Modifica</th></tr>
+                    <tr><td>total.parcels</td><td>567</td><td>5</td><td>30/07/2025 16:45</td></tr>
+                    <tr><td>total.buildings</td><td>423</td><td>7</td><td>30/07/2025 17:22</td></tr>
+                    <tr><td>office_data.surveys</td><td>257</td><td>3</td><td>29/07/2025 14:30</td></tr>
+                </table>
+            </li>
+        </ol>
+        
+        <h5>Analisi Rollback</h5>
+        <ol>
+            <li><strong>Tab Rollback:</strong> Cronologia del mese</li>
+            <li><strong>Report rollback:</strong>
+                <ul>
+                    <li>Numero operazioni: 3</li>
+                    <li>Record interessati: 5</li>
+                    <li>Tasso successo: 100%</li>
+                    <li>Motivi: Correzione errori di import (2), Annullamento modifica non autorizzata (1)</li>
+                </ul>
+            </li>
+        </ol>
+        
+        <h5>Report Finale</h5>
+        <ol>
+            <li><strong>Compila report compliance:</strong>
+                <ul>
+                    <li>Executive summary con metriche chiave</li>
+                    <li>Dettaglio modifiche per schema critico</li>
+                    <li>Analisi pattern utenti e orari</li>
+                    <li>Documentazione rollback con giustificazioni</li>
+                    <li>Raccomandazioni per mese successivo</li>
+                </ul>
+            </li>
+            <li><strong>Allegati:</strong>
+                <ul>
+                    <li>Export CSV completo delle modifiche</li>
+                    <li>Screenshot statistiche principali</li>
+                    <li>Log rollback con motivazioni</li>
+                </ul>
+            </li>
+        </ol>
+    </div>
+    
+    <div class="info">
+        <h4>Template Report Compliance</h4>
+        <pre>REPORT COMPLIANCE AUDIT SYSTEM - LUGLIO 2025
+
+EXECUTIVE SUMMARY:
+- Periodo: 01/07/2025 - 31/07/2025
+- Modifiche totali: 1,247
+- Utenti attivi: 12
+- Tabelle monitorate: 35
+- Rollback eseguiti: 3 (100% successo)
+
+DISTRIBUZIONE MODIFICHE:
+- INSERT: 345 (27.7%)
+- UPDATE: 724 (58.1%)  
+- DELETE: 178 (14.3%)
+
+COMPLIANCE STATUS:
+✓ Tutte le modifiche tracciate
+✓ Utenti identificati per ogni operazione
+✓ Rollback documentati con motivi validi
+✓ Nessuna violazione policy rilevata
+
+RACCOMANDAZIONI:
+- Implementare validazione automatica per batch import
+- Training aggiuntivo per utenti con alto numero rollback
+- Estendere monitoraggio a schema sectorial</pre>
+    </div>
+    
+    <h2>Esempio 5: Disaster Recovery</h2>
+    
+    <div class="scenario">
+        <h3>Scenario Critico</h3>
+        <p><strong>Situazione:</strong> Alle 14:30 di venerdì, uno script automatico malfunzionante ha eseguito DELETE massive su tabelle critiche. Necessario ripristino urgente.</p>
+        
+        <p><strong>Impatto:</strong> 2,847 record eliminati da total.buildings e total.parcels</p>
+        
+        <p><strong>Obiettivo:</strong> Ripristino completo entro 30 minuti per evitare interruzione servizi</p>
+    </div>
+    
+    <div class="warning">
+        <h4>🚨 PROCEDURA DI EMERGENZA</h4>
+        <p>Questa è una procedura di disaster recovery. Esegui solo in situazioni critiche con approvazione management.</p>
+    </div>
+    
+    <div class="step-by-step">
+        <h4>Procedura Disaster Recovery</h4>
+        
+        <h5>Fase 1: Valutazione Danno (2 minuti)</h5>
+        <ol>
+            <li><strong>Tab Monitoring - Filtro emergenza:</strong>
+                <ul>
+                    <li>Period: Last hour</li>
+                    <li>Action: DELETE (ordina per operazione)</li>
+                    <li>Conta DELETE: 2,847 operazioni dalle 14:30</li>
+                </ul>
+            </li>
+            <li><strong>Identifica fonte:</strong> Utente "auto_script", operazioni massive concentrate in 3 minuti</li>
+            <li><strong>Stop script:</strong> Disattiva processo automatico per prevenire ulteriori danni</li>
+        </ol>
+        
+        <h5>Fase 2: Rollback di Emergenza (5 minuti)</h5>
+        <ol>
+            <li><strong>Tab Rollback → User Changes</strong></li>
+            <li><strong>Configurazione emergenza:</strong>
+                <ul>
+                    <li>User: auto_script</li>
+                    <li>Minutes ago: 30 (margine di sicurezza)</li>
+                    <li>Reason: "EMERGENCY: Disaster recovery - script malfunction deleted 2847 records - full restoration required"</li>
+                </ul>
+            </li>
+            <li><strong>SKIP dry run per emergenza:</strong> Clicca direttamente "Execute User Rollback"</li>
+            <li><strong>Conferma immediata:</strong> "Yes" su dialog conferma</li>
+            <li><strong>Monitoraggio:</strong> Osserva progress in Results</li>
+        </ol>
+        
+        <h5>Fase 3: Verifica Ripristino (10 minuti)</h5>
+        <ol>
+            <li><strong>Verifica cronologia rollback:</strong>
+                <ul>
+                    <li>Records Affected: 2847</li>
+                    <li>Success: Yes</li>
+                    <li>Timestamp: 14:37:22</li>
+                </ul>
+            </li>
+            <li><strong>Test funzionalità:</strong>
+                <ul>
+                    <li>Query sample su total.buildings: record ripristinati</li>
+                    <li>Test applicazioni dipendenti: funzionanti</li>
+                    <li>Verifica integrità referenziale: OK</li>
+                </ul>
+            </li>
+            <li><strong>Comunicazione stakeholder:</strong> "Sistema ripristinato, operativo alle 14:45"</li>
+        </ol>
+        
+        <h5>Fase 4: Post-Incident (13 minuti)</h5>
+        <ol>
+            <li><strong>Documentazione incidente:</strong>
+                <ul>
+                    <li>Timeline dettagliata degli eventi</li>
+                    <li>Root cause analysis dello script</li>
+                    <li>Efficacia della procedura di recovery</li>
+                </ul>
+            </li>
+            <li><strong>Misure preventive:</strong>
+                <ul>
+                    <li>Review permessi script automatici</li>
+                    <li>Implementazione validazioni aggiuntive</li>
+                    <li>Test disaster recovery su ambiente staging</li>
+                </ul>
+            </li>
+            <li><strong>Report management:</strong> Incident resolved in 15 minutes, zero data loss</li>
+        </ol>
+    </div>
+    
+    <div class="success">
+        <h4>Risultato Disaster Recovery</h4>
+        <ul>
+            <li>✓ <strong>Tempo di ripristino:</strong> 15 minuti (target 30 minuti)</li>
+            <li>✓ <strong>Data loss:</strong> Zero - tutti i record ripristinati</li>
+            <li>✓ <strong>Downtime:</strong> 7 minuti (14:30-14:37)</li>
+            <li>✓ <strong>Integrità:</strong> Tutti i controlli passati</li>
+            <li>✓ <strong>Cause identified:</strong> Script validation bug</li>
+            <li>✓ <strong>Prevention:</strong> Nuove validazioni implementate</li>
+        </ul>
+    </div>
+    
+    <h2>Best Practices da Tutti gli Esempi</h2>
+    
+    <h3>Setup e Configurazione</h3>
+    <div class="feature">
+        <ul>
+            <li><strong>Test sempre la connessione</strong> prima di salvare configurazioni</li>
+            <li><strong>Installa sistema audit</strong> su ambienti di sviluppo per familiarizzare</li>
+            <li><strong>Monitora solo schemi necessari</strong> per ottimizzare performance</li>
+            <li><strong>Documenta la configurazione</strong> per future riferimenti</li>
+        </ul>
+    </div>
+    
+    <h3>Monitoraggio Quotidiano</h3>
+    <div class="feature">
+        <ul>
+            <li><strong>Controllo mattutino</strong> delle modifiche notturne</li>
+            <li><strong>Filtri mirati</strong> per analisi efficaci</li>
+            <li><strong>Auto-refresh selettivo</strong> solo quando necessario</li>
+            <li><strong>Export regolari</strong> per backup e analisi offline</li>
+        </ul>
+    </div>
+    
+    <h3>Investigazioni</h3>
+    <div class="feature">
+        <ul>
+            <li><strong>Usa auto-fill</strong> per collegamenti rapidi tra tab</li>
+            <li><strong>Confronta versioni</strong> per capire esattamente cosa è cambiato</li>
+            <li><strong>Documenta le scoperte</strong> per creare una knowledge base</li>
+            <li><strong>Cerca pattern</strong> nelle modifiche anomale</li>
+        </ul>
+    </div>
+    
+    <h3>Rollback</h3>
+    <div class="feature">
+        <ul>
+            <li><strong>Sempre dry run</strong> per modifiche utente multiple</li>
+            <li><strong>Motivi dettagliati</strong> per ogni operazione</li>
+            <li><strong>Backup preventivo</strong> prima di rollback critici</li>
+            <li><strong>Comunicazione team</strong> per operazioni significative</li>
+        </ul>
+    </div>
+    
+    <h3>Emergenze</h3>
+    <div class="warning">
+        <ul>
+            <li><strong>Procedura definita</strong> per disaster recovery</li>
+            <li><strong>Autorizzazioni chiare</strong> per chi può eseguire rollback di emergenza</li>
+            <li><strong>Test regolari</strong> delle procedure di recovery</li>
+            <li><strong>Comunicazione immediate</strong> durante incidenti</li>
+        </ul>
+    </div>
+    
+    <h2>Checklist Rapide</h2>
+    
+    <h3>✅ Setup Iniziale</h3>
+    <div class="info">
+        <ul>
+            <li>□ Database connection testata</li>
+            <li>□ Audit system installato</li>
+            <li>□ Schemi critici monitorati</li>
+            <li>□ Status verificato (tutti Active)</li>
+            <li>□ Test modifica su record di prova</li>
+            <li>□ Trigger funzionanti correttamente</li>
+        </ul>
+    </div>
+    
+    <h3>🔍 Investigazione</h3>
+    <div class="info">
+        <ul>
+            <li>□ Filtri applicati correttamente</li>
+            <li>□ Record details esaminati</li>
+            <li>□ Cronologia versioni analizzata</li>
+            <li>□ Confronto versioni eseguito</li>
+            <li>□ Causa identificata</li>
+            <li>□ Soluzione pianificata</li>
+        </ul>
+    </div>
+    
+    <h3>🔄 Rollback</h3>
+    <div class="warning">
+        <ul>
+            <li>□ Backup database disponibile</li>
+            <li>□ Autorizzazioni verificate</li>
+            <li>□ Dry run eseguito (se applicabile)</li>
+            <li>□ Motivo documentato</li>
+            <li>□ Team informato</li>
+            <li>□ Rollback eseguito</li>
+            <li>□ Risultato verificato</li>
+            <li>□ Follow-up documentato</li>
+        </ul>
+    </div>
+    
+    <p><em>Questi esempi forniscono una base solida per utilizzare efficacemente l'Audit System Manager. Adatta le procedure alle specificità del tuo ambiente e delle tue esigenze organizzative.</em></p>
+</body>
+</html>
